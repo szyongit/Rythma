@@ -8,7 +8,7 @@ const command = new SlashCommandBuilder()
 
 async function execute(client: Client, interaction: ChatInputCommandInteraction) {
     const actionRowBuilder = new ActionRowBuilder<ButtonBuilder>();
-    actionRowBuilder.addComponents(new ButtonBuilder({ label: 'My GitHub', style: ButtonStyle.Link, url: 'https://github.com/szyongit' }))
+    actionRowBuilder.addComponents(new ButtonBuilder({ label: 'Rythma on GitHub', style: ButtonStyle.Link, url: 'https://github.com/szyongit/Rythma' }))
     interaction.reply({ embeds: [ReplyEmbed.buildEmbed("Version: 0.1 (beta)\nAuthor: Szyon", "Rythma", false, false)] , components:[actionRowBuilder], ephemeral:true});
 }
 
