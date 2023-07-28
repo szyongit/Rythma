@@ -1,4 +1,4 @@
-import { Client, REST, GatewayIntentBits, Routes, ActivityType, ReactionUserManager } from 'discord.js';
+import { Client, REST, GatewayIntentBits, Routes, ActivityType, ReactionUserManager, ChannelType } from 'discord.js';
 import { config } from 'dotenv';
 
 import Commandhandler from './handler/commandhandler';
@@ -67,11 +67,11 @@ client.on('ready', (client) => {
     updatePresence();
 });
 client.on('interactionCreate', async (interaction) => {
-    Commandhandler.handle(client, interaction);
-    ComponentHandler.handle(client, interaction);
+    if(interaction.isChatInputCommand()) {
+        Commandhandler.handle(client, interaction);
+    } else {
+        ComponentHandler.handle(client, interaction);
+    }
 });
-client.on('messageCreate', (message) => {
-    
-})
 
 main();

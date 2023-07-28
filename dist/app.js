@@ -62,9 +62,11 @@ client.on('ready', (client) => {
     updatePresence();
 });
 client.on('interactionCreate', async (interaction) => {
-    commandhandler_1.default.handle(client, interaction);
-    componenthandler_1.default.handle(client, interaction);
-});
-client.on('messageCreate', (message) => {
+    if (interaction.isChatInputCommand()) {
+        commandhandler_1.default.handle(client, interaction);
+    }
+    else {
+        componenthandler_1.default.handle(client, interaction);
+    }
 });
 main();
