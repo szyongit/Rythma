@@ -33,13 +33,13 @@ async function handle(client: Client, interaction: Interaction) {
             return;
         }
 
-        const url = data.get(value);
+        const url = data.channelsMap.get(value);
         if (!url) {
             interaction.reply({ embeds: [Replyembed.build({ title: 'This genre is not implemented yet!', isError: true })], ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
 
-        await interaction.reply({ embeds: [Replyembed.build({ title: 'Loading stream...' })] });
+        await interaction.reply({ embeds: [Replyembed.build({ title: '•••' })] });
 
         const connection = AudioHandler.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
         const audioRource = AudioHandler.loadResource(url);
@@ -53,7 +53,7 @@ async function handle(client: Client, interaction: Interaction) {
         }
 
         connection.subscribe(audioData.player);
-        interaction.editReply({ embeds: [Replyembed.build({ title: 'Playing...', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
+        interaction.editReply({ embeds: [Replyembed.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
         return;
     }
 
@@ -71,7 +71,7 @@ async function handle(client: Client, interaction: Interaction) {
             AudioHandler.play(guildId, audioData.resource);
             connection.subscribe(audioData.player);
 
-            interaction.reply({ embeds: [Replyembed.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.editReply({ embeds: [Replyembed.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
         if (interaction.customId === 'pause_button') {
@@ -94,7 +94,7 @@ async function handle(client: Client, interaction: Interaction) {
         if (interaction.customId === 'leave_button') {
             const connection = getVoiceConnection(guildId);
             if (!connection) {
-                interaction.reply({ embeds: [Replyembed.build({ title: 'I am in not voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+                interaction.reply({ embeds: [Replyembed.build({ title: 'I am in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
                 return;
             }
 

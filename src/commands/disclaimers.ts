@@ -9,7 +9,7 @@ const command = new SlashCommandBuilder()
 async function execute(client: Client, interaction: ChatInputCommandInteraction) {
     const actionRowBuilder = new ActionRowBuilder<ButtonBuilder>();
     actionRowBuilder.addComponents(new ButtonBuilder({ label: 'ilovemusic.de', style: ButtonStyle.Link, url: 'https://ilovemusic.de/' }));
-    interaction.reply({ embeds: [ReplyEmbed.build({color:'Red', title:'DISCLAIMER!', message:'With the use of this bot you automatically agree that the developer of this bot is not responsible for any damage done to non NSFW channels or copyright rights.\nThe music is streamed from ilovemusic.de and the developer has no effect on what is streamed!'})] , components:[actionRowBuilder], ephemeral:true});
+    interaction.reply({ embeds: [ReplyEmbed.build({color:'Red', title:'DISCLAIMER!', thumbnailURL:'https://cdn.discordapp.com/attachments/1093151583161815161/1134418224914628709/disclaimer.png', message:'With the use of this bot you automatically agree that the developer of this bot is not responsible for any damage done to non NSFW channels or copyright rights.\nThe music is streamed from ilovemusic.de and the developer has no effect on what is streamed!'})] , components:[actionRowBuilder], ephemeral:true});
 }
 
 export default {

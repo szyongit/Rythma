@@ -30,12 +30,12 @@ async function handle(client, interaction) {
             interaction.reply({ embeds: [replyembed_1.default.build({ title: 'Stopped playing!', color: 'Red' })], ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
-        const url = data_1.default.get(value);
+        const url = data_1.default.channelsMap.get(value);
         if (!url) {
             interaction.reply({ embeds: [replyembed_1.default.build({ title: 'This genre is not implemented yet!', isError: true })], ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
-        await interaction.reply({ embeds: [replyembed_1.default.build({ title: 'Loading stream...' })] });
+        await interaction.reply({ embeds: [replyembed_1.default.build({ title: '•••' })] });
         const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
         const audioRource = audiohandler_1.default.loadResource(url);
         audiohandler_1.default.play(guildId, audioRource);
@@ -46,7 +46,7 @@ async function handle(client, interaction) {
             return;
         }
         connection.subscribe(audioData.player);
-        interaction.editReply({ embeds: [replyembed_1.default.build({ title: 'Playing...', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
+        interaction.editReply({ embeds: [replyembed_1.default.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
         return;
     }
     if (interaction.isButton()) {
@@ -60,7 +60,7 @@ async function handle(client, interaction) {
             const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
             audiohandler_1.default.play(guildId, audioData.resource);
             connection.subscribe(audioData.player);
-            interaction.reply({ embeds: [replyembed_1.default.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.editReply({ embeds: [replyembed_1.default.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
         if (interaction.customId === 'pause_button') {
@@ -82,7 +82,7 @@ async function handle(client, interaction) {
         if (interaction.customId === 'leave_button') {
             const connection = (0, voice_1.getVoiceConnection)(guildId);
             if (!connection) {
-                interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I am in not voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I am in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
                 return;
             }
             audiohandler_1.default.stop(guildId);

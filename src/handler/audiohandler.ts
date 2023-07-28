@@ -58,7 +58,7 @@ function play(guild:string, audioResource:AudioResource<unknown>):boolean {
     setResource(guild, audioResource);
     playerData = playerMap.get(guild);
 
-    if(!playerData?.resource) return false;
+    if(!playerData?.resource || playerData.resource.ended) return false;
 
     playerData.player.play(playerData?.resource);
     return true;

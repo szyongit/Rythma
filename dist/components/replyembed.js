@@ -6,6 +6,8 @@ function build(options) {
     embed.setDescription(options.message || null);
     embed.setTitle(options.title || null);
     embed.setColor(options.color ? options.color : (options.isError ? 'DarkRed' : 'DarkPurple'));
+    embed.setImage(options.imageURL || null);
+    embed.setThumbnail(options.thumbnailURL || null);
     if (options.timestamp)
         embed.setTimestamp();
     return embed;

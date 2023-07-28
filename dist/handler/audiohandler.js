@@ -51,7 +51,7 @@ function play(guild, audioResource) {
         return false;
     setResource(guild, audioResource);
     playerData = playerMap.get(guild);
-    if (!playerData?.resource)
+    if (!playerData?.resource || playerData.resource.ended)
         return false;
     playerData.player.play(playerData?.resource);
     return true;

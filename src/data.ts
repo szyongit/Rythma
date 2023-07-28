@@ -19,7 +19,31 @@ let channelsData = [
     { name: 'germanschlager', value: 'https://streams.ilovemusic.de/iloveradio25.mp3' },
     { name: 'germanrap', value: 'https://streams.ilovemusic.de/iloveradio6.mp3' }
 ]
+let optionsArray = [
+    { label: 'POP', value: 'newpop' },
+    { label: 'ROCK', value: 'rock' },
+    { label: 'HIPHOP', value: 'hiphop' },
+    { label: 'US RAP ONLY', value: 'usrap' },
+    { label: 'HARDSTYLE', value: 'hardstlye' },
+    { label: 'CHILLHOP', value: 'chillhop' },
+    { label: 'DANCE', value: 'dance' },
+    { label: 'CREATEST HITS', value: 'greatesthits' },
+    { label: '2010+ THROWBACKS', value: '2010s' },
+    { label: '2000+ THROWBACKS', value: '2000s' },
+    { label: '1990+ THROWBACKS', value: '90s' },
+    { label: 'NIGHT CLUB', value: 'club' },
+    { label: 'BEACH VIBEZ', value: 'beach' },
+    { label: 'CHRISTMAS', value: 'christmas' },
+    { label: 'TRASHPOP', value: 'trashpop' },
+    { label: 'TOP 100 CHARTS GERMANY', value: 'chartsgermany' },
+    { label: 'GERMAN SCHLAGER', value: 'germanschlager' },
+    { label: 'GERMAN RAP', value: 'germanrap' },
+    { label: 'NONE', value: 'none' }
+]
 
-const dataMap = new Map(channelsData.map((element) => [element.name, element.value]));
+const channelsMap = new Map(channelsData.map((element) => [element.name, element.value]));
 
-export default dataMap;
+export default {
+    channelsMap:channelsMap,
+    optionsArray:optionsArray
+};

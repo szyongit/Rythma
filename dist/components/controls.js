@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
+const data_1 = __importDefault(require("../data"));
 const embed = new discord_js_1.EmbedBuilder();
 embed.setTitle("Rythma Radio Player (BETA)");
 embed.setDescription("powered by https://ilovemusic.de/\nThe free german internet radio!");
@@ -9,7 +13,7 @@ const selectMenuActionRow = new discord_js_1.ActionRowBuilder();
 const selectMenu = new discord_js_1.StringSelectMenuBuilder();
 selectMenu.setCustomId('genre_selector');
 selectMenu.setPlaceholder('Select a genre');
-selectMenu.addOptions({ label: 'POP', value: 'newpop' }, { label: 'ROCK', value: 'rock' }, { label: 'HIPHOP', value: 'hiphop' }, { label: 'US RAP ONLY', value: 'usrap' }, { label: 'HARDSTYLE', value: 'hardstlye' }, { label: 'CHILLHOP', value: 'chillhop' }, { label: 'DANCE', value: 'dance' }, { label: 'CREATEST HITS', value: 'greatesthits' }, { label: '2010+ THROWBACKS', value: '2010s' }, { label: '2000+ THROWBACKS', value: '2000s' }, { label: '1990+ THROWBACKS', value: '90s' }, { label: 'NIGHT CLUB', value: 'club' }, { label: 'BEACH VIBEZ', value: 'beach' }, { label: 'CHRISTMAS', value: 'christmas' }, { label: 'TRASHPOP', value: 'trashpop' }, { label: 'TOP 100 CHARTS GERMANY', value: 'chartsgermany' }, { label: 'GERMAN SCHLAGER', value: 'germanschlager' }, { label: 'GERMAN RAP', value: 'germanrap' }, { label: 'NONE', value: 'none' });
+selectMenu.addOptions(data_1.default.optionsArray);
 selectMenuActionRow.addComponents(selectMenu);
 const buttonActionRow = new discord_js_1.ActionRowBuilder();
 const playButton = new discord_js_1.ButtonBuilder();
