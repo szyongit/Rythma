@@ -7,4 +7,4 @@ Rythma can stream internet radios by genre to voice channels.
 
 Wanna test Rythma to yourself?<br />
 Open this link in your browser:<br />
-(https://discord.com/api/oauth2/authorize?client_id=1093143762496127056&permissions=2184243264&scope=bot)
+https://discord.com/api/oauth2/authorize?client_id=1093143762496127056&permissions=2184243264&scope=bot
