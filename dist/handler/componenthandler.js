@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const voice_1 = require("@discordjs/voice");
 const data_1 = __importDefault(require("../data"));
 const audiohandler_1 = __importDefault(require("./audiohandler"));
+const replyembed_1 = __importDefault(require("../components/replyembed"));
 async function handle(client, interaction) {
     const guild = interaction.guild;
     if (!guild) {
@@ -26,66 +27,63 @@ async function handle(client, interaction) {
         interaction.values.forEach((loopValue) => value = loopValue);
         const url = data_1.default.get(value);
         if (!url) {
-            interaction.reply({ content: "This genre is not implemented yet!", ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [replyembed_1.default.build({ title: 'This genre is not implemented yet!', isError: true })], ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
-        await interaction.reply({ content: 'Loading stream...' });
+        await interaction.reply({ embeds: [replyembed_1.default.build({ title: 'Loading stream...' })] });
         const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
         const audioRource = audiohandler_1.default.loadResource(url);
         audiohandler_1.default.play(guildId, audioRource);
         const audioData = audiohandler_1.default.getData(guildId);
         if (!audioData) {
-            interaction.editReply({ content: "OOPS, something went wrong!" }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.editReply({ embeds: [replyembed_1.default.build({ title: 'OOPS, an error occured!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
             audiohandler_1.default.stop(guildId);
             return;
         }
         connection.subscribe(audioData.player);
-        interaction.editReply({ content: "Playing..." }).then(message => setTimeout(() => message.delete(), 2500));
+        interaction.editReply({ embeds: [replyembed_1.default.build({ title: 'Playing...', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
         return;
     }
     if (interaction.isButton()) {
         if (interaction.customId === 'play_button') {
             const audioData = audiohandler_1.default.getData(guildId);
-            if (!audioData) {
-                interaction.reply({ content: "Please select a genre to play!", ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+            if (!audioData || !audioData.resource) {
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: 'Please select a genre to play!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
                 return;
             }
-            if (!audioData.resource) {
-                interaction.reply({ content: "Please select a genre!", ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
-                return;
-            }
+            await interaction.reply({ embeds: [replyembed_1.default.build({ title: 'Loading stream...' })] });
             const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
             audiohandler_1.default.play(guildId, audioData.resource);
             connection.subscribe(audioData.player);
-            interaction.reply({ content: "Playing ▶!", ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [replyembed_1.default.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
         if (interaction.customId === 'pause_button') {
             const paused = audiohandler_1.default.pause(guildId);
             if (!paused) {
-                interaction.reply({ content: "OOPS, something went wrong!", ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: 'OOPS, an error occured!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
                 return;
             }
-            interaction.reply({ content: "Paused ⏸!", ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [replyembed_1.default.build({ title: '⏸', color: 'Grey' })] }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
         if (interaction.customId === 'stop_button') {
             const stopped = audiohandler_1.default.stop(guildId);
             if (!stopped)
                 return;
-            interaction.reply({ content: "Stopped ⏹!", ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [replyembed_1.default.build({ title: '⏹', color: 'Red' })] }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
         if (interaction.customId === 'leave_button') {
             const connection = (0, voice_1.getVoiceConnection)(guildId);
             if (!connection) {
-                interaction.reply({ content: 'I am in not voice channel!', ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I am in not voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
                 return;
             }
             audiohandler_1.default.stop(guildId);
             connection.disconnect();
             connection.destroy();
-            interaction.reply({ content: "I left the voice channel!", ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I left the voicechannel!' })] }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
     }

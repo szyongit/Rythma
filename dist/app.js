@@ -36,6 +36,10 @@ async function main() {
 }
 client.on('ready', (client) => {
     console.log(`\x1b[32m${client.user.tag} is now running!\x1b[0m\n`);
+    client.user?.setPresence({
+        status: 'online',
+        activities: [{ name: 'ilovemusic.de', type: discord_js_1.ActivityType.Listening }],
+    });
 });
 client.on('interactionCreate', async (interaction) => {
     commandhandler_1.default.handle(client, interaction);

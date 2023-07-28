@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
-function buildEmbed(message, title, isError, timestamp) {
+function build(options) {
     const embed = new discord_js_1.EmbedBuilder();
-    embed.setDescription(message);
-    embed.setTitle(title || null);
-    embed.setColor((isError ? 'Red' : 'Purple'));
-    if (timestamp)
+    embed.setDescription(options.message || null);
+    embed.setTitle(options.title || null);
+    embed.setColor(options.color ? options.color : (options.isError ? 'DarkRed' : 'DarkPurple'));
+    if (options.timestamp)
         embed.setTimestamp();
     return embed;
 }
 exports.default = {
-    buildEmbed: buildEmbed
+    build: build
 };

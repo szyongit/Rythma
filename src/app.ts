@@ -1,4 +1,4 @@
-import { Client, REST, GatewayIntentBits, Routes } from 'discord.js';
+import { Client, REST, GatewayIntentBits, Routes, ActivityType } from 'discord.js';
 import { config } from 'dotenv';
 
 import Commandhandler from './handler/commandhandler';
@@ -36,6 +36,10 @@ async function main() {
 
 client.on('ready', (client) => {
     console.log(`\x1b[32m${client.user.tag} is now running!\x1b[0m\n`)
+    client.user?.setPresence({
+        status:'online',
+        activities:[{name:'ilovemusic.de', type:ActivityType.Listening}],
+    });
 });
 client.on('interactionCreate', async (interaction) => {
     Commandhandler.handle(client, interaction);

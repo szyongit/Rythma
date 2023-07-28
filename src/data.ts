@@ -11,7 +11,7 @@ let channelsData = [
     { name: 'christmas', value: 'https://streams.ilovemusic.de/iloveradio8.mp3' },
     { name: 'trashpop', value: 'https://streams.ilovemusic.de/iloveradio19.mp3' },
     { name: 'chartsgermany', value: 'https://streams.ilovemusic.de/iloveradio9.mp3' },
-    { name: 'summer', value: 'https://streams.ilovemusic.de/iloveradio7.mp3' },
+    { name: 'beach', value: 'https://streams.ilovemusic.de/iloveradio7.mp3' },
     { name: 'club', value: 'https://streams.ilovemusic.de/iloveradio20.mp3' },
     { name: '90s', value: 'https://streams.ilovemusic.de/iloveradio24.mp3' },
     { name: 'rock', value: 'https://streams.ilovemusic.de/iloveradio4.mp3' },

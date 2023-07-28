@@ -11,7 +11,7 @@ const command = new discord_js_1.SlashCommandBuilder()
 async function execute(client, interaction) {
     const actionRowBuilder = new discord_js_1.ActionRowBuilder();
     actionRowBuilder.addComponents(new discord_js_1.ButtonBuilder({ label: 'ilovemusic.de', style: discord_js_1.ButtonStyle.Link, url: 'https://ilovemusic.de/' }));
-    interaction.reply({ embeds: [replyembed_1.default.buildEmbed("With the use of this bot you automatically agree that the developer of this bot is not responsible for any damage done to non NSFW channels or copyright rights.\nThe music is streamed from ilovemusic.de and the developer has no effect on what is streamed!", "DISCLAIMER", true, false)], components: [actionRowBuilder], ephemeral: true });
+    interaction.reply({ embeds: [replyembed_1.default.build({ color: 'Red', title: 'DISCLAIMER!', message: 'With the use of this bot you automatically agree that the developer of this bot is not responsible for any damage done to non NSFW channels or copyright rights.\nThe music is streamed from ilovemusic.de and the developer has no effect on what is streamed!' })], components: [actionRowBuilder], ephemeral: true });
 }
 exports.default = {
     command: command,

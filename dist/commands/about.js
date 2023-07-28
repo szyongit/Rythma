@@ -10,8 +10,8 @@ const command = new discord_js_1.SlashCommandBuilder()
     .setDescription('Shows informations about the bot!');
 async function execute(client, interaction) {
     const actionRowBuilder = new discord_js_1.ActionRowBuilder();
-    actionRowBuilder.addComponents(new discord_js_1.ButtonBuilder({ label: 'My GitHub', style: discord_js_1.ButtonStyle.Link, url: 'https://github.com/szyongit' }));
-    interaction.reply({ embeds: [replyembed_1.default.buildEmbed("Version: 0.1 (beta)\nAuthor: Szyon", "Rythma", false, false)], components: [actionRowBuilder], ephemeral: true });
+    actionRowBuilder.addComponents(new discord_js_1.ButtonBuilder({ label: 'Rythma on GitHub', style: discord_js_1.ButtonStyle.Link, url: 'https://github.com/szyongit/Rythma' }));
+    interaction.reply({ embeds: [replyembed_1.default.build({ title: 'About Rythma', message: 'powered by ilovemusic.de\nCopyright © Szyon 2023' })], components: [actionRowBuilder], ephemeral: true });
 }
 exports.default = {
     command: command,

@@ -3,7 +3,7 @@ import { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder,
 const embed = new EmbedBuilder();
 embed.setTitle("Rythma Radio Player (BETA)");
 embed.setDescription("powered by https://ilovemusic.de/\nThe free german internet radio!");
-embed.setColor('Purple');
+embed.setColor('DarkPurple');
 
 const selectMenuActionRow = new ActionRowBuilder<StringSelectMenuBuilder>();
 const selectMenu = new StringSelectMenuBuilder()
@@ -21,13 +21,12 @@ selectMenu.addOptions(
     { label: '2010+ THROWBACKS', value: '2010s' },
     { label: '2000+ THROWBACKS', value: '2000s' },
     { label: '1990+ THROWBACKS', value: '90s' },
-    { label: 'I❤BASS BY HBZ', value: 'ilovebass' },
     { label: 'NIGHT CLUB', value: 'club' },
     { label: 'BEACH VIBEZ', value: 'beach' },
-    { label: 'Christmas', value: 'christmas' },
+    { label: 'CHRISTMAS', value: 'christmas' },
     { label: 'TRASHPOP', value: 'trashpop' },
     { label: 'TOP 100 CHARTS GERMANY', value: 'chartsgermany' },
-    { label: 'GERMAN SCHLAGER ON MALLORCA', value: 'germanschlager' },
+    { label: 'GERMAN SCHLAGER', value: 'germanschlager' },
     { label: 'GERMAN RAP', value: 'germanrap' }
 );
 selectMenuActionRow.addComponents(selectMenu);

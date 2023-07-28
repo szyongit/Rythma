@@ -1,15 +1,15 @@
-import { EmbedBuilder } from 'discord.js';
+import { ColorResolvable, EmbedBuilder, StringMappedInteractionTypes } from 'discord.js';
 
-function buildEmbed(message:string, title?:string, isError?:boolean, timestamp?:boolean):EmbedBuilder {
+function build(options:{title?:string, message?:string, isError?:boolean, color?:ColorResolvable, timestamp?:boolean}):EmbedBuilder {
     const embed = new EmbedBuilder();
-    embed.setDescription(message);
-    embed.setTitle(title || null);
-    embed.setColor((isError ? 'Red' : 'Purple'));
-    if(timestamp) embed.setTimestamp();
+    embed.setDescription(options.message || null);
+    embed.setTitle(options.title || null);
+    embed.setColor(options.color ? options.color : (options.isError ? 'DarkRed' : 'DarkPurple'));
+    if(options.timestamp) embed.setTimestamp();
 
     return embed;
 }
 
 export default {
-    buildEmbed:buildEmbed
+    build:build
 }
