@@ -46,6 +46,7 @@ async function updatePresence() {
                 activities:[{name:`on ${serverCount} servers.`, type:ActivityType.Playing}],
             });
             presenceState = 1;
+            return;
         }
 
         if(presenceState == 1) {
@@ -54,6 +55,7 @@ async function updatePresence() {
                 activities:[{name:'ilovemusic.de', type:ActivityType.Listening}],
             });
             presenceState = 0;
+            return;
         }
         
     }, 12000);

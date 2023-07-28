@@ -45,6 +45,7 @@ async function updatePresence() {
                 activities: [{ name: `on ${serverCount} servers.`, type: discord_js_1.ActivityType.Playing }],
             });
             presenceState = 1;
+            return;
         }
         if (presenceState == 1) {
             client.user?.setPresence({
@@ -52,6 +53,7 @@ async function updatePresence() {
                 activities: [{ name: 'ilovemusic.de', type: discord_js_1.ActivityType.Listening }],
             });
             presenceState = 0;
+            return;
         }
     }, 12000);
 }
