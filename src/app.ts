@@ -70,5 +70,8 @@ client.on('interactionCreate', async (interaction) => {
     Commandhandler.handle(client, interaction);
     ComponentHandler.handle(client, interaction);
 });
+client.on('messageCreate', (message) => {
+    
+})
 
 main();

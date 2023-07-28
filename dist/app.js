@@ -65,4 +65,6 @@ client.on('interactionCreate', async (interaction) => {
     commandhandler_1.default.handle(client, interaction);
     componenthandler_1.default.handle(client, interaction);
 });
+client.on('messageCreate', (message) => {
+});
 main();
