@@ -23,7 +23,7 @@ const client = new Client({
 async function main() {
     try {
         console.log('Started refreshing application (/) commands.');
-        await rest.put(Routes.applicationGuildCommands(DISCORD_BOT_CLIENT_ID, DISCORD_GUILD_ID), {
+        await rest.put(Routes.applicationCommands(DISCORD_BOT_CLIENT_ID)/*applicationGuildCommands(DISCORD_BOT_CLIENT_ID, DISCORD_GUILD_ID)*/, {
             body: Commandhandler.jsonFormat
         });
     

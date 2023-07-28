@@ -23,7 +23,7 @@ const client = new discord_js_1.Client({
 async function main() {
     try {
         console.log('Started refreshing application (/) commands.');
-        await rest.put(discord_js_1.Routes.applicationGuildCommands(DISCORD_BOT_CLIENT_ID, DISCORD_GUILD_ID), {
+        await rest.put(discord_js_1.Routes.applicationCommands(DISCORD_BOT_CLIENT_ID) /*applicationGuildCommands(DISCORD_BOT_CLIENT_ID, DISCORD_GUILD_ID)*/, {
             body: commandhandler_1.default.jsonFormat
         });
         console.log('Logging in...');
