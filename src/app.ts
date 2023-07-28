@@ -1,4 +1,4 @@
-import { Client, REST, GatewayIntentBits, Routes, ActivityType } from 'discord.js';
+import { Client, REST, GatewayIntentBits, Routes, ActivityType, ReactionUserManager } from 'discord.js';
 import { config } from 'dotenv';
 
 import Commandhandler from './handler/commandhandler';
@@ -34,12 +34,35 @@ async function main() {
     };
 }
 
+let presenceState:number;
+async function updatePresence() {
+    presenceState = 0;
+
+    setInterval(() => {
+        if(presenceState == 0) {
+            const serverCount = client.guilds.cache.size;
+            client.user?.setPresence({
+                status:'online',
+                activities:[{name:`on ${serverCount} servers.`, type:ActivityType.Playing}],
+            });
+            presenceState = 1;
+        }
+
+        if(presenceState == 1) {
+            client.user?.setPresence({
+                status:'online',
+                activities:[{name:'ilovemusic.de', type:ActivityType.Listening}],
+            });
+            presenceState = 0;
+        }
+        
+    }, 12000);
+    
+}
+
 client.on('ready', (client) => {
     console.log(`\x1b[32m${client.user.tag} is now running!\x1b[0m\n`)
-    client.user?.setPresence({
-        status:'online',
-        activities:[{name:'ilovemusic.de', type:ActivityType.Listening}],
-    });
+    updatePresence();
 });
 client.on('interactionCreate', async (interaction) => {
     Commandhandler.handle(client, interaction);
