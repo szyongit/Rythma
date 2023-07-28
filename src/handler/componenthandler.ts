@@ -27,6 +27,12 @@ async function handle(client: Client, interaction: Interaction) {
         let value = "";
         interaction.values.forEach((loopValue) => value = loopValue);
 
+        if(value === 'none') {
+            AudioHandler.stop(guildId);
+            interaction.reply({ embeds: [Replyembed.build({ title: 'Stopped playing!', color:'Red' })], ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+            return;
+        }
+
         const url = data.get(value);
         if (!url) {
             interaction.reply({ embeds: [Replyembed.build({ title: 'This genre is not implemented yet!', isError: true })], ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));

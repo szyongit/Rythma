@@ -27,7 +27,8 @@ selectMenu.addOptions(
     { label: 'TRASHPOP', value: 'trashpop' },
     { label: 'TOP 100 CHARTS GERMANY', value: 'chartsgermany' },
     { label: 'GERMAN SCHLAGER', value: 'germanschlager' },
-    { label: 'GERMAN RAP', value: 'germanrap' }
+    { label: 'GERMAN RAP', value: 'germanrap' },
+    { label: 'NONE', value: 'none' }
 );
 selectMenuActionRow.addComponents(selectMenu);
 
