@@ -59,7 +59,6 @@ async function updatePresence() {
         }
         
     }, 12000);
-    
 }
 
 client.on('ready', (client) => {

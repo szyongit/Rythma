@@ -27,7 +27,7 @@ let optionsArray = [
     { label: 'HARDSTYLE', value: 'hardstlye' },
     { label: 'CHILLHOP', value: 'chillhop' },
     { label: 'DANCE', value: 'dance' },
-    { label: 'CREATEST HITS', value: 'greatesthits' },
+    { label: 'GREATEST HITS', value: 'greatesthits' },
     { label: '2010+ THROWBACKS', value: '2010s' },
     { label: '2000+ THROWBACKS', value: '2000s' },
     { label: '1990+ THROWBACKS', value: '90s' },

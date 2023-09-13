@@ -7,9 +7,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const commandDir = path_1.default.dirname(__dirname) + path_1.default.sep + "commands" + path_1.default.sep;
 const commandMap = new Map();
-fs_1.default.readdirSync(commandDir).forEach(file => {
-    if (!file.endsWith('.js'))
-        return;
+fs_1.default.readdirSync(commandDir).filter((element => (element.endsWith('.js')))).forEach(file => {
     const Command = require(commandDir + file.toString());
     commandMap.set(Command.default.command.name, Command.default);
 });
