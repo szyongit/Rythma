@@ -63,7 +63,6 @@ async function handle(client: Client, interaction: Interaction) {
             }
 
             await interaction.reply({ embeds: [Replyembed.build({ title: '•••' })] });
-
             
             const connection = AudioHandler.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
             AudioHandler.play(guildId, audioData.resource, true);
