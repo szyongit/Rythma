@@ -1,4 +1,7 @@
 "use strict";
+/*
+This file is only used until database is implemented!
+*/
 Object.defineProperty(exports, "__esModule", { value: true });
 let channelsData = [
     { name: "dance", value: "https://streams.ilovemusic.de/iloveradio1.mp3" },
@@ -43,7 +46,9 @@ let optionsArray = [
     { label: 'NONE', value: 'none' }
 ];
 const channelsMap = new Map(channelsData.map((element) => [element.name, element.value]));
+const playTimeMap = new Map();
 exports.default = {
     channelsMap: channelsMap,
-    optionsArray: optionsArray
+    optionsArray: optionsArray,
+    playTimeMap: playTimeMap
 };

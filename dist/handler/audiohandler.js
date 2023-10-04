@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const voice_1 = require("@discordjs/voice");
+const data_1 = __importDefault(require("../data"));
 const playerMap = new Map();
 function addAudioPlayer(guild) {
     if (playerMap.has(guild))
@@ -30,7 +34,7 @@ function getData(guild) {
         return undefined;
     return playerData;
 }
-function play(guild, audioResource) {
+function play(guild, audioResource, savePlayTimeData) {
     if (!playerMap.has(guild)) {
         addAudioPlayer(guild);
     }
@@ -41,8 +45,20 @@ function play(guild, audioResource) {
     playerData = playerMap.get(guild);
     if (!playerData?.resource)
         return false;
+    if (savePlayTimeData) {
+        setPlayTimeData(guild);
+    }
     playerData.player.play(loadResource(playerData.resource));
+    data_1.default.playTimeMap.set(guild, { lastStart: Date.now(), time: data_1.default.playTimeMap.get(guild)?.time || 0 });
     return true;
+}
+function setPlayTimeData(guild) {
+    const playStart = data_1.default.playTimeMap.get(guild);
+    if (!playStart)
+        return;
+    const now = Date.now();
+    const newTime = (playStart.time || 0) + (now - (playStart.lastStart || now));
+    data_1.default.playTimeMap.set(guild, { lastStart: undefined, time: newTime });
 }
 function pause(guild) {
     if (!playerMap.has(guild))
@@ -51,6 +67,7 @@ function pause(guild) {
     if (!playerData)
         return false;
     playerData?.player.pause();
+    setPlayTimeData(guild);
     return true;
 }
 function unpause(guild) {
@@ -60,6 +77,7 @@ function unpause(guild) {
     if (!playerData)
         return false;
     playerData?.player.unpause();
+    data_1.default.playTimeMap.set(guild, { lastStart: Date.now() });
     return true;
 }
 function stop(guild) {
@@ -69,6 +87,8 @@ function stop(guild) {
     if (!playerData)
         return false;
     playerData?.player.stop();
+    setPlayTimeData(guild);
+    console.log(new Date(data_1.default.playTimeMap.get(guild)?.time || 0).getMinutes());
     return true;
 }
 function connectToVoiceChannel(channelId, guildId, adapterCreator) {

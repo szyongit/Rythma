@@ -1,6 +1,8 @@
 import {createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayerStatus, AudioPlayer, AudioResource, PlayerSubscription, joinVoiceChannel, VoiceConnection} from '@discordjs/voice';
 import { InternalDiscordGatewayAdapterCreator } from 'discord.js';
 
+import Data from '../data'
+
 const playerMap = new Map<string, {player:AudioPlayer, resource:string | undefined}>();
 
 function addAudioPlayer(guild:string) {
@@ -35,7 +37,7 @@ function getData(guild:string): {player:AudioPlayer, resource:string | undefined
     return playerData;
 }
 
-function play(guild:string, audioResource:string):boolean {
+function play(guild:string, audioResource:string, savePlayTimeData?:boolean):boolean {
     if(!playerMap.has(guild)) {
         addAudioPlayer(guild);
     }
@@ -48,8 +50,22 @@ function play(guild:string, audioResource:string):boolean {
 
     if(!playerData?.resource) return false;
 
+    if(savePlayTimeData) {
+        setPlayTimeData(guild);
+    }
+
     playerData.player.play(loadResource(playerData.resource));
+    Data.playTimeMap.set(guild, {lastStart:Date.now(), time:Data.playTimeMap.get(guild)?.time || 0})
     return true;
+}
+
+function setPlayTimeData(guild:string) {
+    const playStart = Data.playTimeMap.get(guild);
+    if(!playStart) return;
+
+    const now = Date.now();
+    const newTime = (playStart.time || 0) + (now - (playStart.lastStart || now));
+    Data.playTimeMap.set(guild, {lastStart:undefined, time:newTime});
 }
 
 function pause(guild:string):boolean {
@@ -59,6 +75,8 @@ function pause(guild:string):boolean {
     if(!playerData) return false;
 
     playerData?.player.pause();
+    setPlayTimeData(guild);
+
     return true;
 }
 
@@ -69,6 +87,8 @@ function unpause(guild:string):boolean {
     if(!playerData) return false;
 
     playerData?.player.unpause();
+    Data.playTimeMap.set(guild, {lastStart:Date.now()});
+
     return true;
 }
 
@@ -79,6 +99,10 @@ function stop(guild:string):boolean {
     if(!playerData) return false;
     
     playerData?.player.stop()
+    setPlayTimeData(guild);
+
+    console.log(new Date(Data.playTimeMap.get(guild)?.time || 0).getMinutes());
+
     return true;
 }
 

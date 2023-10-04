@@ -1,3 +1,7 @@
+/*
+This file is only used until database is implemented!
+*/
+
 let channelsData = [
     { name: "dance", value: "https://streams.ilovemusic.de/iloveradio1.mp3" },
     { name: "2000s", value: "https://streams.ilovemusic.de/iloveradio37.mp3" },
@@ -43,7 +47,11 @@ let optionsArray = [
 
 const channelsMap = new Map(channelsData.map((element) => [element.name, element.value]));
 
+type PlayTime = {lastStart:number | undefined, time?:number};
+const playTimeMap = new Map<string, PlayTime>();
+
 export default {
     channelsMap:channelsMap,
-    optionsArray:optionsArray
+    optionsArray:optionsArray,
+    playTimeMap:playTimeMap
 };
