@@ -37,8 +37,7 @@ async function handle(client, interaction) {
         }
         await interaction.reply({ embeds: [replyembed_1.default.build({ title: '•••' })] });
         const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
-        const audioRource = audiohandler_1.default.loadResource(url);
-        audiohandler_1.default.play(guildId, audioRource);
+        audiohandler_1.default.play(guildId, url);
         const audioData = audiohandler_1.default.getData(guildId);
         if (!audioData) {
             interaction.editReply({ embeds: [replyembed_1.default.build({ title: 'OOPS, an error occured!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
@@ -56,7 +55,7 @@ async function handle(client, interaction) {
                 interaction.reply({ embeds: [replyembed_1.default.build({ title: 'Please select a genre to play!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
                 return;
             }
-            await interaction.reply({ embeds: [replyembed_1.default.build({ title: 'Loading stream...' })] });
+            await interaction.reply({ embeds: [replyembed_1.default.build({ title: '•••' })] });
             const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
             audiohandler_1.default.play(guildId, audioData.resource);
             connection.subscribe(audioData.player);
@@ -82,13 +81,13 @@ async function handle(client, interaction) {
         if (interaction.customId === 'leave_button') {
             const connection = (0, voice_1.getVoiceConnection)(guildId);
             if (!connection) {
-                interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I am in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I\'m in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
                 return;
             }
             audiohandler_1.default.stop(guildId);
             connection.disconnect();
             connection.destroy();
-            interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I left the voicechannel!' })] }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [replyembed_1.default.build({ title: ':wave:' })] }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
     }

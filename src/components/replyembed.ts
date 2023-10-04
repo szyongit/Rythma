@@ -1,4 +1,4 @@
-import { ColorResolvable, EmbedBuilder, StringMappedInteractionTypes } from 'discord.js';
+import { ColorResolvable, EmbedBuilder } from 'discord.js';
 
 function build(options:{title?:string, message?:string, isError?:boolean, color?:ColorResolvable, timestamp?:boolean, imageURL?:string|null, thumbnailURL?:string|null}):EmbedBuilder {
     const embed = new EmbedBuilder();

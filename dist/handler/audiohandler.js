@@ -10,7 +10,6 @@ function addAudioPlayer(guild) {
             noSubscriber: voice_1.NoSubscriberBehavior.Pause,
         },
     });
-    setPlayerListeners(player);
     playerMap.set(guild, { player: player, resource: undefined });
 }
 function setResource(guild, audioResource) {
@@ -19,17 +18,6 @@ function setResource(guild, audioResource) {
         return;
     playerData.resource = audioResource;
     playerMap.set(guild, playerData);
-}
-function setPlayerListeners(player) {
-    player.on(voice_1.AudioPlayerStatus.Playing, () => {
-        console.log("Player is playing!");
-    });
-    player.on(voice_1.AudioPlayerStatus.Paused, () => {
-        console.log("Player is paused!");
-    });
-    player.on(voice_1.AudioPlayerStatus.Idle, () => {
-        console.log("Player is idling!");
-    });
 }
 function loadResource(url) {
     return (0, voice_1.createAudioResource)(url);
@@ -51,9 +39,9 @@ function play(guild, audioResource) {
         return false;
     setResource(guild, audioResource);
     playerData = playerMap.get(guild);
-    if (!playerData?.resource || playerData.resource.ended)
+    if (!playerData?.resource)
         return false;
-    playerData.player.play(playerData?.resource);
+    playerData.player.play(loadResource(playerData.resource));
     return true;
 }
 function pause(guild) {

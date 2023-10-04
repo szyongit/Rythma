@@ -40,8 +40,7 @@ async function handle(client: Client, interaction: Interaction) {
         await interaction.reply({ embeds: [Replyembed.build({ title: '•••' })] });
 
         const connection = AudioHandler.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
-        const audioRource = AudioHandler.loadResource(url);
-        AudioHandler.play(guildId, audioRource);
+        AudioHandler.play(guildId, url);
 
         const audioData = AudioHandler.getData(guildId);
         if (!audioData) {
@@ -63,8 +62,9 @@ async function handle(client: Client, interaction: Interaction) {
                 return;
             }
 
-            await interaction.reply({ embeds: [Replyembed.build({ title: 'Loading stream...' })] });
+            await interaction.reply({ embeds: [Replyembed.build({ title: '•••' })] });
 
+            
             const connection = AudioHandler.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
             AudioHandler.play(guildId, audioData.resource);
             connection.subscribe(audioData.player);
@@ -92,14 +92,14 @@ async function handle(client: Client, interaction: Interaction) {
         if (interaction.customId === 'leave_button') {
             const connection = getVoiceConnection(guildId);
             if (!connection) {
-                interaction.reply({ embeds: [Replyembed.build({ title: 'I am in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+                interaction.reply({ embeds: [Replyembed.build({ title: 'I\'m in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
                 return;
             }
 
             AudioHandler.stop(guildId);
             connection.disconnect();
             connection.destroy();
-            interaction.reply({ embeds: [Replyembed.build({ title: 'I left the voicechannel!' })] }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [Replyembed.build({ title: ':wave:' })] }).then(message => setTimeout(() => message.delete(), 2500));
             return;
         }
     }

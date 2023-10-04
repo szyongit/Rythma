@@ -1,4 +1,4 @@
-import { Client, REST, GatewayIntentBits, Routes, ActivityType, ReactionUserManager, ChannelType } from 'discord.js';
+import { Client, REST, GatewayIntentBits, Routes, ActivityType } from 'discord.js';
 import { config } from 'dotenv';
 
 import Commandhandler from './handler/commandhandler';

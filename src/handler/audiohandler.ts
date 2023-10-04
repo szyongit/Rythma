@@ -1,7 +1,7 @@
 import {createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayerStatus, AudioPlayer, AudioResource, PlayerSubscription, joinVoiceChannel, VoiceConnection} from '@discordjs/voice';
 import { InternalDiscordGatewayAdapterCreator } from 'discord.js';
 
-const playerMap = new Map<string, {player:AudioPlayer, resource:AudioResource | undefined}>();
+const playerMap = new Map<string, {player:AudioPlayer, resource:string | undefined}>();
 
 function addAudioPlayer(guild:string) {
     if(playerMap.has(guild)) return;
@@ -11,11 +11,10 @@ function addAudioPlayer(guild:string) {
             noSubscriber: NoSubscriberBehavior.Pause,
         },
     })
-    setPlayerListeners(player);
     playerMap.set(guild, {player:player, resource:undefined});
 }
 
-function setResource(guild:string, audioResource:AudioResource<unknown>) {
+function setResource(guild:string, audioResource:string) {
     const playerData = playerMap.get(guild);
     if(!playerData) return;
     
@@ -23,22 +22,11 @@ function setResource(guild:string, audioResource:AudioResource<unknown>) {
     playerMap.set(guild, playerData);
 }
 
-function setPlayerListeners(player:AudioPlayer) {
-    player.on(AudioPlayerStatus.Playing, () => {
-        console.log("Player is playing!");
-    })
-    player.on(AudioPlayerStatus.Paused, () => {
-        console.log("Player is paused!");
-    })
-    player.on(AudioPlayerStatus.Idle, () => {
-        console.log("Player is idling!");
-    })}
-
 function loadResource(url:string): AudioResource {
     return createAudioResource(url);
 }
 
-function getData(guild:string): {player:AudioPlayer, resource:AudioResource | undefined} | undefined {
+function getData(guild:string): {player:AudioPlayer, resource:string | undefined} | undefined {
     if(!playerMap.has(guild)) return;
 
     const playerData = playerMap.get(guild);
@@ -47,7 +35,7 @@ function getData(guild:string): {player:AudioPlayer, resource:AudioResource | un
     return playerData;
 }
 
-function play(guild:string, audioResource:AudioResource<unknown>):boolean {
+function play(guild:string, audioResource:string):boolean {
     if(!playerMap.has(guild)) {
         addAudioPlayer(guild);
     }
@@ -58,9 +46,9 @@ function play(guild:string, audioResource:AudioResource<unknown>):boolean {
     setResource(guild, audioResource);
     playerData = playerMap.get(guild);
 
-    if(!playerData?.resource || playerData.resource.ended) return false;
+    if(!playerData?.resource) return false;
 
-    playerData.player.play(playerData?.resource);
+    playerData.player.play(loadResource(playerData.resource));
     return true;
 }
 
