@@ -1,4 +1,4 @@
-import { Client, GuildMember, Interaction, ReactionUserManager } from "discord.js";
+import { Client, GuildMember, Interaction } from "discord.js";
 import { getVoiceConnection } from "@discordjs/voice";
 
 import data from '../data';
@@ -40,7 +40,7 @@ async function handle(client: Client, interaction: Interaction) {
         await interaction.reply({ embeds: [Replyembed.build({ title: '•••' })] });
 
         const connection = AudioHandler.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
-        AudioHandler.play(guildId, url, true);
+        AudioHandler.play(guildId, url);
 
         const audioData = AudioHandler.getData(guildId);
         if (!audioData) {
@@ -65,7 +65,7 @@ async function handle(client: Client, interaction: Interaction) {
             await interaction.reply({ embeds: [Replyembed.build({ title: '•••' })] });
             
             const connection = AudioHandler.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
-            AudioHandler.play(guildId, audioData.resource, true);
+            AudioHandler.play(guildId, audioData.resource);
             connection.subscribe(audioData.player);
 
             interaction.editReply({ embeds: [Replyembed.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));

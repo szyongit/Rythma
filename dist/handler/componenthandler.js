@@ -37,7 +37,7 @@ async function handle(client, interaction) {
         }
         await interaction.reply({ embeds: [replyembed_1.default.build({ title: '•••' })] });
         const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
-        audiohandler_1.default.play(guildId, url, true);
+        audiohandler_1.default.play(guildId, url);
         const audioData = audiohandler_1.default.getData(guildId);
         if (!audioData) {
             interaction.editReply({ embeds: [replyembed_1.default.build({ title: 'OOPS, an error occured!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
@@ -57,7 +57,7 @@ async function handle(client, interaction) {
             }
             await interaction.reply({ embeds: [replyembed_1.default.build({ title: '•••' })] });
             const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
-            audiohandler_1.default.play(guildId, audioData.resource, true);
+            audiohandler_1.default.play(guildId, audioData.resource);
             connection.subscribe(audioData.player);
             interaction.editReply({ embeds: [replyembed_1.default.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
             return;

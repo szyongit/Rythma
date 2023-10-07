@@ -23,17 +23,17 @@ playButton.setLabel("▶");
 playButton.setCustomId("play_button");
 
 const pauseButton = new ButtonBuilder();
-pauseButton.setStyle(ButtonStyle.Danger);
+pauseButton.setStyle(ButtonStyle.Secondary);
 pauseButton.setLabel("⏸");
 pauseButton.setCustomId("pause_button");
 
 const stopButton = new ButtonBuilder();
-stopButton.setStyle(ButtonStyle.Secondary);
+stopButton.setStyle(ButtonStyle.Danger);
 stopButton.setLabel("⏹");
 stopButton.setCustomId("stop_button");
 
 const leaveButton = new ButtonBuilder();
-leaveButton.setStyle(ButtonStyle.Secondary);
+leaveButton.setStyle(ButtonStyle.Primary);
 leaveButton.setLabel("🚪");
 leaveButton.setCustomId("leave_button");
 

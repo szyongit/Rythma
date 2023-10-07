@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const voice_1 = require("@discordjs/voice");
-const data_1 = __importDefault(require("../data"));
+const databasehandler_1 = __importDefault(require("../handler/databasehandler"));
 const playerMap = new Map();
 function addAudioPlayer(guild) {
     if (playerMap.has(guild))
@@ -34,7 +34,7 @@ function getData(guild) {
         return undefined;
     return playerData;
 }
-function play(guild, audioResource, savePlayTimeData) {
+function play(guild, audioResource) {
     if (!playerMap.has(guild)) {
         addAudioPlayer(guild);
     }
@@ -45,20 +45,23 @@ function play(guild, audioResource, savePlayTimeData) {
     playerData = playerMap.get(guild);
     if (!playerData?.resource)
         return false;
-    if (savePlayTimeData) {
-        setPlayTimeData(guild);
-    }
-    playerData.player.play(loadResource(playerData.resource));
-    data_1.default.playTimeMap.set(guild, { lastStart: Date.now(), time: data_1.default.playTimeMap.get(guild)?.time || 0 });
+    const resource = loadResource(playerData.resource);
+    resource.volume?.setVolume(0.75);
+    databasehandler_1.default.PlayTime.findOne({ guild: guild }).exec().then((doc) => {
+        if (!doc) {
+            databasehandler_1.default.PlayTime.updateOne({ guild: guild }, { lastStart: Date.now(), playing: true }, { upsert: true }).exec();
+            return;
+        }
+        if (doc.playing === true) {
+            const now = Date.now();
+            const newTime = (doc.time || 0) + (now - (doc.lastStart || now));
+            databasehandler_1.default.PlayTime.updateOne({ guild: guild }, { time: newTime, lastStart: Date.now(), playing: true }).exec();
+            return;
+        }
+        databasehandler_1.default.PlayTime.updateOne({ guild: guild }, { lastStart: Date.now(), playing: true }, { upsert: true }).exec();
+    });
+    playerData.player.play(resource /*loadResource(playerData.resource)*/);
     return true;
-}
-function setPlayTimeData(guild) {
-    const playStart = data_1.default.playTimeMap.get(guild);
-    if (!playStart)
-        return;
-    const now = Date.now();
-    const newTime = (playStart.time || 0) + (now - (playStart.lastStart || now));
-    data_1.default.playTimeMap.set(guild, { lastStart: undefined, time: newTime });
 }
 function pause(guild) {
     if (!playerMap.has(guild))
@@ -66,8 +69,16 @@ function pause(guild) {
     const playerData = playerMap.get(guild);
     if (!playerData)
         return false;
+    databasehandler_1.default.PlayTime.findOne({ guild: guild }).exec().then((doc) => {
+        if (!doc)
+            return;
+        if (doc.playing === false)
+            return;
+        const now = Date.now();
+        const newTime = (doc.time || 0) + (now - (doc.lastStart || now));
+        databasehandler_1.default.PlayTime.updateOne({ guild: guild }, { time: newTime, playing: false }).exec();
+    });
     playerData?.player.pause();
-    setPlayTimeData(guild);
     return true;
 }
 function unpause(guild) {
@@ -76,8 +87,10 @@ function unpause(guild) {
     const playerData = playerMap.get(guild);
     if (!playerData)
         return false;
+    databasehandler_1.default.PlayTime.findOne({ guild: guild }).exec().then((doc) => {
+        databasehandler_1.default.PlayTime.updateOne({ guild: guild }, { lastStart: Date.now(), playing: true }, { upsert: true }).exec();
+    });
     playerData?.player.unpause();
-    data_1.default.playTimeMap.set(guild, { lastStart: Date.now() });
     return true;
 }
 function stop(guild) {
@@ -86,9 +99,16 @@ function stop(guild) {
     const playerData = playerMap.get(guild);
     if (!playerData)
         return false;
+    databasehandler_1.default.PlayTime.findOne({ guild: guild }).exec().then((doc) => {
+        if (!doc)
+            return;
+        if (doc.playing === false)
+            return;
+        const now = Date.now();
+        const newTime = (doc.time || 0) + (now - (doc.lastStart || now));
+        databasehandler_1.default.PlayTime.updateOne({ guild: guild }, { time: newTime, playing: false }).exec();
+    });
     playerData?.player.stop();
-    setPlayTimeData(guild);
-    console.log(new Date(data_1.default.playTimeMap.get(guild)?.time || 0).getMinutes());
     return true;
 }
 function connectToVoiceChannel(channelId, guildId, adapterCreator) {

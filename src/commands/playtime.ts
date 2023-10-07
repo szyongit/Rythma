@@ -1,29 +1,39 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
 
 import ReplyEmbed from '../components/replyembed';
-import Data from '../data';
+import DatabaseHandler from '../handler/databasehandler';
 
 const command = new SlashCommandBuilder()
 .setName('playtime')
-.setDescription('Shows the total playtime of this guild!')
+.setDescription('Shows the total playtime for this guild!')
 
 async function execute(client: Client, interaction: ChatInputCommandInteraction) {
     const guildId = interaction.guildId;
-
     if(!guildId) {
-        interaction.reply({ embeds: [ReplyEmbed.build({title:"OOPS, an error occurred!", isError:true})] , ephemeral:true});
+        interaction.reply({ embeds: [ReplyEmbed.build({title:"This command can only be used inside of servers!", isError:true})]});
         return;
     }
 
-    const playTimeData = Data.playTimeMap.get(guildId);
-    const time = (playTimeData?.time || 0) + (Date.now() - (playTimeData?.lastStart || Date.now()));
-    const guildThumbnail = interaction.guild?.iconURL({size:128});
+    const doc = await DatabaseHandler.PlayTime.findOne({guild:guildId}).exec();
+
+    if(!doc) {
+        interaction.reply({ embeds: [ReplyEmbed.build({title:"Could not load data from database!", isError:true})] , ephemeral:true});
+        return;
+    }
+
+    const now = Date.now();
+    const isPlaying = doc.playing === true;
+
+    const time = (doc.time || 0) + (isPlaying ? (now - (doc.lastStart || now)) : 0);
+    const guildThumbnail = interaction.guild?.iconURL({size:128}) || client.user?.avatarURL({size:128});
 
     interaction.reply({ embeds: [ReplyEmbed.build({
         title:interaction.guild?.name || "Guild", 
-        message:`Playtime:\n${(time/1000/60/60/24).toFixed(0)} Days, ${((time/1000/60/60)%60).toFixed(0)} Hours, ${((time/1000/60)%60).toFixed(0)} Minutes, ${((time/1000)%60).toFixed(0)} Seconds`,
+        message:`Playtime:\n${(Math.floor(time/1000/60/60/24))} Days, ${((Math.floor(time/1000/60/60)%60))} Hours, ${((Math.floor(time/1000/60)%60))} Minutes, ${(Math.floor((time/1000)%60))} Seconds`,
         thumbnailURL:guildThumbnail
-    })], ephemeral:true});
+    })]}).then((message) => {
+        setTimeout(() => message.delete(), 3500);
+    });
 }
 
 export default {

@@ -1,7 +1,7 @@
-import {createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayerStatus, AudioPlayer, AudioResource, PlayerSubscription, joinVoiceChannel, VoiceConnection} from '@discordjs/voice';
-import { InternalDiscordGatewayAdapterCreator } from 'discord.js';
+import {createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayer, AudioResource, joinVoiceChannel, VoiceConnection} from '@discordjs/voice';
+import { InternalDiscordGatewayAdapterCreator, ReactionUserManager } from 'discord.js';
 
-import Data from '../data'
+import DatabaseHandler from '../handler/databasehandler';
 
 const playerMap = new Map<string, {player:AudioPlayer, resource:string | undefined}>();
 
@@ -37,7 +37,7 @@ function getData(guild:string): {player:AudioPlayer, resource:string | undefined
     return playerData;
 }
 
-function play(guild:string, audioResource:string, savePlayTimeData?:boolean):boolean {
+function play(guild:string, audioResource:string):boolean {
     if(!playerMap.has(guild)) {
         addAudioPlayer(guild);
     }
@@ -50,22 +50,27 @@ function play(guild:string, audioResource:string, savePlayTimeData?:boolean):boo
 
     if(!playerData?.resource) return false;
 
-    if(savePlayTimeData) {
-        setPlayTimeData(guild);
-    }
+    const resource = loadResource(playerData.resource);
+    resource.volume?.setVolume(0.75);
 
-    playerData.player.play(loadResource(playerData.resource));
-    Data.playTimeMap.set(guild, {lastStart:Date.now(), time:Data.playTimeMap.get(guild)?.time || 0})
+    DatabaseHandler.PlayTime.findOne({guild:guild}).exec().then((doc) => {
+        if(!doc) {
+            DatabaseHandler.PlayTime.updateOne({guild:guild}, {lastStart:Date.now(), playing:true}, {upsert:true}).exec();
+            return;
+        }
+
+        if(doc.playing === true) {
+            const now = Date.now();
+            const newTime = (doc.time || 0) + (now - (doc.lastStart || now));
+            DatabaseHandler.PlayTime.updateOne({guild:guild}, {time:newTime, lastStart:Date.now(), playing:true}).exec();
+            return;
+        }
+        
+        DatabaseHandler.PlayTime.updateOne({guild:guild}, {lastStart:Date.now(), playing:true}, {upsert:true}).exec();
+    });
+
+    playerData.player.play(resource/*loadResource(playerData.resource)*/);
     return true;
-}
-
-function setPlayTimeData(guild:string) {
-    const playStart = Data.playTimeMap.get(guild);
-    if(!playStart) return;
-
-    const now = Date.now();
-    const newTime = (playStart.time || 0) + (now - (playStart.lastStart || now));
-    Data.playTimeMap.set(guild, {lastStart:undefined, time:newTime});
 }
 
 function pause(guild:string):boolean {
@@ -74,8 +79,15 @@ function pause(guild:string):boolean {
     const playerData = playerMap.get(guild);
     if(!playerData) return false;
 
+    DatabaseHandler.PlayTime.findOne({guild:guild}).exec().then((doc) => {
+        if(!doc) return;
+        if(doc.playing === false) return;
+
+        const now = Date.now();
+        const newTime = (doc.time || 0) + (now - (doc.lastStart || now));
+        DatabaseHandler.PlayTime.updateOne({guild:guild}, {time:newTime, playing:false}).exec();
+    });
     playerData?.player.pause();
-    setPlayTimeData(guild);
 
     return true;
 }
@@ -86,8 +98,10 @@ function unpause(guild:string):boolean {
     const playerData = playerMap.get(guild);
     if(!playerData) return false;
 
+    DatabaseHandler.PlayTime.findOne({guild:guild}).exec().then((doc) => {
+        DatabaseHandler.PlayTime.updateOne({guild:guild}, {lastStart:Date.now(), playing:true}, {upsert:true}).exec();
+    });
     playerData?.player.unpause();
-    Data.playTimeMap.set(guild, {lastStart:Date.now()});
 
     return true;
 }
@@ -98,10 +112,15 @@ function stop(guild:string):boolean {
     const playerData = playerMap.get(guild);
     if(!playerData) return false;
     
-    playerData?.player.stop()
-    setPlayTimeData(guild);
+    DatabaseHandler.PlayTime.findOne({guild:guild}).exec().then((doc) => {
+        if(!doc) return;
+        if(doc.playing === false) return;
 
-    console.log(new Date(Data.playTimeMap.get(guild)?.time || 0).getMinutes());
+        const now = Date.now();
+        const newTime = (doc.time || 0) + (now - (doc.lastStart || now));
+        DatabaseHandler.PlayTime.updateOne({guild:guild}, {time:newTime, playing:false}).exec();
+    });
+    playerData?.player.stop();
 
     return true;
 }

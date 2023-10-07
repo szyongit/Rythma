@@ -5,13 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const dotenv_1 = require("dotenv");
+const databasehandler_1 = __importDefault(require("./handler/databasehandler"));
 const commandhandler_1 = __importDefault(require("./handler/commandhandler"));
 const componenthandler_1 = __importDefault(require("./handler/componenthandler"));
 (0, dotenv_1.config)({ path: '../.env' });
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || "";
 const DISCORD_BOT_CLIENT_ID = process.env.DISCORD_BOT_CLIENT_ID || "";
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID || "";
-const DATABASE_URI = process.env.DATABASE_URI || "";
 const rest = new discord_js_1.REST().setToken(DISCORD_BOT_TOKEN);
 const client = new discord_js_1.Client({
     intents: [
@@ -21,6 +21,14 @@ const client = new discord_js_1.Client({
     ]
 });
 async function main() {
+    console.log("Connecting to database...");
+    await databasehandler_1.default.connectToDB()
+        .then(() => console.log("Connected to database!"))
+        .catch(() => {
+        console.log("Could not connect to database!");
+        process.exit();
+    });
+    console.log();
     try {
         console.log('Started refreshing application (/) commands.');
         await rest.put(discord_js_1.Routes.applicationCommands(DISCORD_BOT_CLIENT_ID) /*applicationGuildCommands(DISCORD_BOT_CLIENT_ID, DISCORD_GUILD_ID)*/, {

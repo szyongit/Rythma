@@ -1,6 +1,8 @@
 import { Client, REST, GatewayIntentBits, Routes, ActivityType } from 'discord.js';
 import { config } from 'dotenv';
 
+import DatabaseHandler from './handler/databasehandler';
+
 import Commandhandler from './handler/commandhandler';
 import ComponentHandler from './handler/componenthandler';
 
@@ -9,7 +11,6 @@ config({path:'../.env'});
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || "";
 const DISCORD_BOT_CLIENT_ID = process.env.DISCORD_BOT_CLIENT_ID || "";
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID || "";
-const DATABASE_URI = process.env.DATABASE_URI || "";
 
 const rest = new REST().setToken(DISCORD_BOT_TOKEN);
 const client = new Client({
@@ -21,6 +22,15 @@ const client = new Client({
 });
 
 async function main() {
+    console.log("Connecting to database...");
+    await DatabaseHandler.connectToDB()
+    .then(() => console.log("Connected to database!"))
+    .catch(() => {
+        console.log("Could not connect to database!")
+        process.exit();
+    });
+    console.log();
+
     try {
         console.log('Started refreshing application (/) commands.');
         await rest.put(Routes.applicationCommands(DISCORD_BOT_CLIENT_ID)/*applicationGuildCommands(DISCORD_BOT_CLIENT_ID, DISCORD_GUILD_ID)*/, {
