@@ -33,6 +33,17 @@ async function connectToDB() {
 function isConnected() {
     return (mongoose.connection != undefined);
 }
+const Users = new mongoose.Schema({
+    id: {
+        type: String
+    },
+    joinTime: {
+        type: Number
+    },
+    time: {
+        type: Number
+    }
+});
 const playTimeData = mongoose.model("Playtime", new mongoose.Schema({
     guild: {
         type: String,
@@ -46,7 +57,8 @@ const playTimeData = mongoose.model("Playtime", new mongoose.Schema({
     },
     playing: {
         type: Boolean
-    }
+    },
+    users: [Users]
 }));
 exports.default = {
     connectToDB: connectToDB,

@@ -11,6 +11,18 @@ function isConnected(): boolean {
     return (mongoose.connection != undefined);
 }
 
+
+const Users = new mongoose.Schema({
+    id: {
+        type:String
+    },
+    joinTime: {
+        type:Number
+    },
+    time: {
+        type:Number
+    }
+});
 const playTimeData = mongoose.model("Playtime", new mongoose.Schema({
     guild:{
         type: String,
@@ -24,7 +36,8 @@ const playTimeData = mongoose.model("Playtime", new mongoose.Schema({
     },
     playing: {
         type:Boolean
-    }
+    },
+    users: [Users]
 }));
 
 export default {

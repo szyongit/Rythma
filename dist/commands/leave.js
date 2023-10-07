@@ -13,18 +13,19 @@ const command = new discord_js_1.SlashCommandBuilder()
 async function execute(client, interaction) {
     const guildId = interaction.guildId;
     if (!guildId) {
-        interaction.reply({ content: "OOPS, AN ERROR OCCURED!" });
+        interaction.reply({ content: "OOPS, AN ERROR OCCURED!" })
+            .then((message) => setTimeout(() => message.delete(), 3000));
         return;
     }
     const connection = (0, voice_1.getVoiceConnection)(guildId);
     if (!connection) {
-        interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I am in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+        interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I am in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 3000));
         return;
     }
     audiohandler_1.default.stop(guildId);
     connection.disconnect();
     connection.destroy();
-    interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I left the voicechannel!' })] }).then(message => setTimeout(() => message.delete(), 2500));
+    interaction.reply({ embeds: [replyembed_1.default.build({ title: 'I left the voicechannel!' })] }).then(message => setTimeout(() => message.delete(), 3000));
     return;
 }
 exports.default = {

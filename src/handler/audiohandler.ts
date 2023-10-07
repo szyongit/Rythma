@@ -1,4 +1,4 @@
-import {createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayer, AudioResource, joinVoiceChannel, VoiceConnection} from '@discordjs/voice';
+import {createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayer, AudioResource, joinVoiceChannel, VoiceConnection, AudioPlayerStatus} from '@discordjs/voice';
 import { InternalDiscordGatewayAdapterCreator, ReactionUserManager } from 'discord.js';
 
 import DatabaseHandler from '../handler/databasehandler';
@@ -135,6 +135,9 @@ function connectToVoiceChannel(channelId:string, guildId:string, adapterCreator:
     return connection;
 }
 
+function isPlaying(guild:string): boolean {
+    return playerMap.get(guild)?.player.state.status === AudioPlayerStatus.Playing;
+}
 
 export default {
     play:play,
@@ -142,6 +145,7 @@ export default {
     pause:pause,
     unpause:unpause,
     getData:getData,
+    isPlaying:isPlaying,
     loadResource:loadResource,
     connectToVoiceChannel:connectToVoiceChannel
 }

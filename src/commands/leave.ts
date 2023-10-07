@@ -11,20 +11,21 @@ const command = new SlashCommandBuilder()
 async function execute(client: Client, interaction: ChatInputCommandInteraction) {
     const guildId = interaction.guildId;
     if (!guildId) {
-        interaction.reply({ content: "OOPS, AN ERROR OCCURED!" });
+        interaction.reply({ content: "OOPS, AN ERROR OCCURED!" })
+        .then((message) => setTimeout(() => message.delete(), 3000));
         return;
     }
 
     const connection = getVoiceConnection(guildId);
     if (!connection) {
-        interaction.reply({ embeds: [Replyembed.build({ title: 'I am in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+        interaction.reply({ embeds: [Replyembed.build({ title: 'I am in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 3000));
         return;
     }
 
     AudioHandler.stop(guildId);
     connection.disconnect();
     connection.destroy();
-    interaction.reply({ embeds: [Replyembed.build({ title: 'I left the voicechannel!' })] }).then(message => setTimeout(() => message.delete(), 2500));
+    interaction.reply({ embeds: [Replyembed.build({ title: 'I left the voicechannel!' })] }).then(message => setTimeout(() => message.delete(), 3000));
     return;
 }
 

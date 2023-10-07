@@ -1,4 +1,4 @@
-import { Client, REST, GatewayIntentBits, Routes, ActivityType } from 'discord.js';
+import { Client, REST, GatewayIntentBits, Routes, ActivityType, VoiceState } from 'discord.js';
 import { config } from 'dotenv';
 
 import DatabaseHandler from './handler/databasehandler';
@@ -29,6 +29,7 @@ async function main() {
         console.log("Could not connect to database!")
         process.exit();
     });
+
     console.log();
 
     try {
@@ -82,5 +83,60 @@ client.on('interactionCreate', async (interaction) => {
         ComponentHandler.handle(client, interaction);
     }
 });
+
+client.on('voiceStateUpdate', async (oldState, newState) => {
+    if(newState.member?.user == client.user) return;
+    if(!newState.channel?.members.has(client.user?.id || "")) return;
+
+    //deaf
+    if(newState.deaf) {
+        saveListeningTime(oldState, newState);
+        return;
+    }
+
+    //listening
+    if(!newState.deaf) {
+        saveJoinTime(oldState, newState);
+        return;
+    }
+
+    //User joins the channel
+    if(!oldState.channel && newState.channel && !newState.deaf) {
+        await saveJoinTime(oldState, newState);
+        return;
+    }
+
+    //User leaves the channel
+    if(oldState.channel && !newState.channel) {
+        await saveListeningTime(oldState, newState);
+        return;
+    }
+});
+
+async function saveJoinTime(oldState:VoiceState, newState:VoiceState) {
+    const doc = await DatabaseHandler.PlayTime.findOne({guild:newState.guild.id, "users.id":newState.member?.id}).exec();
+    if(!doc) {
+        await DatabaseHandler.PlayTime.updateOne({guild:newState.guild.id}, {$push: {users:{id:newState.member?.id, joinTime:Date.now()}}}, {upsert:true}).exec();
+        return;
+    }
+
+    await DatabaseHandler.PlayTime.updateOne({guild:newState.guild.id, "users.id":`${newState.member?.id}`}, {$set: {"users.$.joinTime":Date.now()}}).exec();
+}
+
+async function saveListeningTime(oldState:VoiceState, newState:VoiceState) {
+    const doc = await DatabaseHandler.PlayTime.findOne({guild:oldState.guild.id, "users.id":`${newState.member?.id}`}).exec();
+    if(!doc) return;
+
+    const userDatas = doc.users.filter((element) => element.id == oldState.member?.id);
+    if(userDatas.length < 1) return;
+    
+    const userData = userDatas[0];
+    const joinTime = userData.joinTime;
+
+    const now = Date.now();
+    const listeningTime = (doc.time || 0) + (now - (joinTime || now));
+
+    await DatabaseHandler.PlayTime.updateOne({guild:newState.guild.id, "users.id":`${newState.member?.id}`}, {$set: {"users.$.time":listeningTime}, $unset:{"users.$.joinTime":""}}, {upsert:true}).exec();
+}
 
 main();
