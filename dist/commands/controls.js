@@ -15,7 +15,7 @@ const command = new discord_js_1.SlashCommandBuilder()
     .addChannelTypes(discord_js_1.ChannelType.GuildText)
     .setName("channel")
     .setDescription("The channel to display the controls in")
-    .setRequired(true))
+    .setRequired(false))
     .addBooleanOption(boolean => boolean
     .setRequired(false)
     .setName("lock")
@@ -24,24 +24,50 @@ async function execute(client, interaction) {
     const guildId = interaction.guildId;
     if (!guildId) {
         interaction.reply({ embeds: [replyembed_1.default.build({ title: "This command can only be used inside of servers!", isError: true })] })
-            .then(message => setTimeout(() => message.delete(), 3000));
+            .then(message => setTimeout(() => message.delete().catch(() => { }), 3000));
         return;
     }
-    const channel = interaction.options.getChannel("channel", true);
+    const channel = interaction.options.getChannel("channel");
     const lockChannel = interaction.options.getBoolean("lock");
     const doc = await databasehandler_1.default.ControlsData.findOne({ guild: guildId }).exec();
-    if (doc) {
-        if (!doc.message) {
-            interaction.reply({ embeds: [replyembed_1.default.build({ title: "Could not delete previous message", isError: true })] })
-                .then(message => setTimeout(() => message.delete(), 3000));
+    //If channel is not specified
+    if (!channel) {
+        if (doc) {
+            const messageChannel = await client.channels.fetch(doc.channel || "");
+            if (!messageChannel) {
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: "Could not send controls to <#" + doc.channel + ">!", isError: true })] })
+                    .then(message => setTimeout(() => message.delete().catch(() => { }), 3000));
+                return;
+            }
+            const message = await messageChannel.messages.fetch(doc.message || "").catch(() => { });
+            if (message)
+                await (message.delete()).catch(() => { });
+            const newMessage = await messageChannel.send({ embeds: controls_1.default.embed, components: controls_1.default.components });
+            await databasehandler_1.default.ControlsData.updateOne({ guild: guildId }, { channel: messageChannel.id, message: newMessage.id, lock: doc.lock }, { upsert: true }).exec()
+                .then(() => {
+                data_1.default.setChannelLocked((!doc.lock ? undefined : messageChannel.id));
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: "Controls are now shown inside of <#" + messageChannel.id + ">!" })] })
+                    .then(message => setTimeout(() => message.delete().catch(() => { }), 3000));
+            }).catch((err) => {
+                console.log(err);
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: "Error whilst trying to save to database. Please try again.", isError: true })] })
+                    .then(message => setTimeout(() => message.delete().catch(() => { }), 3000));
+            });
+            return;
         }
         else {
+            interaction.reply({ embeds: [replyembed_1.default.build({ title: "Please specify a channel first!", isError: true })] })
+                .then(message => setTimeout(() => message.delete().catch(() => { }), 3000));
+            return;
+        }
+        return;
+    }
+    //If channel is specified
+    if (doc) {
+        if (doc.message) {
             const prevChannel = await client.channels.fetch(doc.channel || "");
             if (prevChannel?.type === discord_js_1.ChannelType.GuildText) {
-                await prevChannel.messages.delete(doc.message).catch(() => {
-                    interaction.reply({ embeds: [replyembed_1.default.build({ title: "Could not delete previous message", isError: true })] })
-                        .then(message => setTimeout(() => message.delete(), 3000));
-                });
+                await (prevChannel.messages.delete(doc.message).catch(() => { })).catch(() => { });
             }
         }
     }
@@ -51,38 +77,32 @@ async function execute(client, interaction) {
         if (interaction.replied) {
             await interaction.editReply({ embeds: [replyembed_1.default.build({ title: "Could not display controls inside of <#" + newChannel.id + ">!", isError: true })] })
                 .then(message => setTimeout(() => message.delete(), 3000));
-            ;
         }
         else {
             await interaction.reply({ embeds: [replyembed_1.default.build({ title: "Could not display controls inside of <#" + newChannel.id + ">!", isError: true })] })
                 .then(message => setTimeout(() => message.delete(), 3000));
-            ;
         }
     }
     const locked = ((lockChannel == undefined) ? (!doc?.lock ? false : doc.lock) : lockChannel);
     await databasehandler_1.default.ControlsData.updateOne({ guild: guildId }, { channel: channel.id, message: message.id, lock: locked }, { upsert: true }).exec()
         .then(() => {
-        data_1.default.setLockedChannel((!locked ? undefined : newChannel.id));
+        data_1.default.setChannelLocked((!locked ? undefined : newChannel.id));
         if (interaction.replied) {
             interaction.editReply({ embeds: [replyembed_1.default.build({ title: "Controls are now shown inside of <#" + newChannel.id + ">!" })] })
                 .then(message => setTimeout(() => message.delete(), 3000));
-            ;
         }
         else {
             interaction.reply({ embeds: [replyembed_1.default.build({ title: "Controls are now shown inside of <#" + newChannel.id + ">!" })] })
                 .then(message => setTimeout(() => message.delete(), 3000));
-            ;
         }
     }).catch(() => {
         if (interaction.replied) {
             interaction.editReply({ embeds: [replyembed_1.default.build({ title: "Error whilst trying to save to database. Please try again.", isError: true })] })
                 .then(message => setTimeout(() => message.delete(), 3000));
-            ;
         }
         else {
             interaction.reply({ embeds: [replyembed_1.default.build({ title: "Error whilst trying to save to database. Please try again.", isError: true })] })
                 .then(message => setTimeout(() => message.delete(), 3000));
-            ;
         }
     });
 }

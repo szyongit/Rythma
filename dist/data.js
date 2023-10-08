@@ -1,5 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const databasehandler_1 = __importDefault(require("./handler/databasehandler"));
+const VERSION = "1.0 (BETA)";
 let channelsData = [
     { name: "dance", value: "https://streams.ilovemusic.de/iloveradio1.mp3" },
     { name: "2000s", value: "https://streams.ilovemusic.de/iloveradio37.mp3" },
@@ -43,16 +48,24 @@ let optionsArray = [
     { label: 'NONE', value: 'none' }
 ];
 const channelsMap = new Map(channelsData.map((element) => [element.name, element.value]));
-let lockedChannel = undefined;
-function setLockedChannel(channel) {
-    lockedChannel = channel;
+let lockedChannels = [];
+async function init() {
+    let dbData = await databasehandler_1.default.ControlsData.find({}).select("channel message -_id").exec();
+    lockedChannels = dbData.filter((data) => data.channel != undefined).flatMap((data) => data.channel);
 }
-function getLockedChannel() {
-    return lockedChannel;
+function setChannelLocked(channel) {
+    if (!channel)
+        return;
+    lockedChannels.push(channel);
+}
+function getLockedChannels() {
+    return lockedChannels;
 }
 exports.default = {
+    VERSION: VERSION,
     channelsMap: channelsMap,
     optionsArray: optionsArray,
-    setLockedChannel: setLockedChannel,
-    getLockedChannel: getLockedChannel
+    setChannelLocked: setChannelLocked,
+    getLockedChannels: getLockedChannels,
+    init: init
 };

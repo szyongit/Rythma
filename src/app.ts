@@ -1,15 +1,25 @@
 import { Client, REST, GatewayIntentBits, Routes, ActivityType, VoiceState } from 'discord.js';
 import { config } from 'dotenv';
 
+console.log("Loading database handler...");
 import DatabaseHandler from './handler/databasehandler';
 
-import Commandhandler from './handler/commandhandler';
-import ComponentHandler from './handler/componenthandler';
-import VoiceStateHandler from './handler/voicestatehandler';
-
+console.log("Loading data handler...")
 import Data from './data';
 
+console.log("Loading command handler...");
+import Commandhandler from './handler/commandhandler';
+
+console.log("Loading component handler...");
+import ComponentHandler from './handler/componenthandler';
+
+console.log("Loading voicestate handler...")
+import VoiceStateHandler from './handler/voicestatehandler';
+
+console.log("Loading environment variables...")
 config({path:'../.env'});
+
+console.log();
 
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || "";
 const DISCORD_BOT_CLIENT_ID = process.env.DISCORD_BOT_CLIENT_ID || "";
@@ -32,6 +42,11 @@ async function main() {
         console.log("Could not connect to database!")
         process.exit();
     });
+    console.log();
+
+    console.log("Loading database data...");
+    await Data.init();
+    console.log("Loading finished!");
 
     console.log();
 
@@ -105,12 +120,12 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     await VoiceStateHandler.handle(client, oldState, newState);
 });
 client.on('messageCreate', async (message) => {
-    if(!Data.getLockedChannel()) return;
+    if(!Data.getLockedChannels()) return;
     if(message.author.id === client.user?.id) return;
-    if(message.channel.id !== Data.getLockedChannel()) return;
+    if(!Data.getLockedChannels().includes(message.channel.id)) return;
     if(!message.deletable) return;
 
-    message.delete();
+    await message.delete();
 })
 
 main();

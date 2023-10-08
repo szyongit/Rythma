@@ -1,3 +1,7 @@
+import DatabaseHandler from "./handler/databasehandler";
+
+const VERSION = "1.0 (BETA)";
+
 let channelsData = [
     { name: "dance", value: "https://streams.ilovemusic.de/iloveradio1.mp3" },
     { name: "2000s", value: "https://streams.ilovemusic.de/iloveradio37.mp3" },
@@ -42,19 +46,27 @@ let optionsArray = [
 ]
 
 const channelsMap = new Map(channelsData.map((element) => [element.name, element.value]));
-let lockedChannel:string|undefined = undefined;
+let lockedChannels:string[]= [];
 
-function setLockedChannel(channel:string|undefined) {
-    lockedChannel = channel;
+async function init() {
+    let dbData = await DatabaseHandler.ControlsData.find({}).select("channel message -_id").exec();
+    lockedChannels = <string[]> dbData.filter((data) => data.channel != undefined).flatMap((data) => data.channel);
 }
-function getLockedChannel():string|undefined {
-    return lockedChannel;
+
+function setChannelLocked(channel:string|undefined) {
+    if(!channel) return;
+    lockedChannels.push(channel);
+}
+function getLockedChannels():string[] {
+    return lockedChannels;
 }
 
 
 export default {
+    VERSION:VERSION,
     channelsMap:channelsMap,
     optionsArray:optionsArray,
-    setLockedChannel:setLockedChannel,
-    getLockedChannel:getLockedChannel
+    setChannelLocked:setChannelLocked,
+    getLockedChannels:getLockedChannels,
+    init:init
 };

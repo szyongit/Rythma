@@ -72,7 +72,8 @@ const controlsData = mongoose.model("Control", new mongoose.Schema({
         type: String
     },
     lock: {
-        type: Boolean
+        type: Boolean,
+        default: false
     }
 }));
 exports.default = {

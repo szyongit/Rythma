@@ -5,12 +5,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const dotenv_1 = require("dotenv");
+console.log("Loading database handler...");
 const databasehandler_1 = __importDefault(require("./handler/databasehandler"));
-const commandhandler_1 = __importDefault(require("./handler/commandhandler"));
-const componenthandler_1 = __importDefault(require("./handler/componenthandler"));
-const voicestatehandler_1 = __importDefault(require("./handler/voicestatehandler"));
+console.log("Loading data handler...");
 const data_1 = __importDefault(require("./data"));
+console.log("Loading command handler...");
+const commandhandler_1 = __importDefault(require("./handler/commandhandler"));
+console.log("Loading component handler...");
+const componenthandler_1 = __importDefault(require("./handler/componenthandler"));
+console.log("Loading voicestate handler...");
+const voicestatehandler_1 = __importDefault(require("./handler/voicestatehandler"));
+console.log("Loading environment variables...");
 (0, dotenv_1.config)({ path: '../.env' });
+console.log();
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || "";
 const DISCORD_BOT_CLIENT_ID = process.env.DISCORD_BOT_CLIENT_ID || "";
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID || "";
@@ -30,6 +37,10 @@ async function main() {
         console.log("Could not connect to database!");
         process.exit();
     });
+    console.log();
+    console.log("Loading database data...");
+    await data_1.default.init();
+    console.log("Loading finished!");
     console.log();
     try {
         console.log('Started refreshing application (/) commands.');
@@ -98,14 +109,14 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     await voicestatehandler_1.default.handle(client, oldState, newState);
 });
 client.on('messageCreate', async (message) => {
-    if (!data_1.default.getLockedChannel())
+    if (!data_1.default.getLockedChannels())
         return;
     if (message.author.id === client.user?.id)
         return;
-    if (message.channel.id !== data_1.default.getLockedChannel())
+    if (!data_1.default.getLockedChannels().includes(message.channel.id))
         return;
     if (!message.deletable)
         return;
-    message.delete();
+    await message.delete();
 });
 main();

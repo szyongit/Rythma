@@ -1,8 +1,8 @@
 import { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import data from '../data';
+import Data from '../data';
 
 const embed = new EmbedBuilder();
-embed.setTitle("Rythma Radio Player (BETA)");
+embed.setTitle("Rythma Radio Player v." + Data.VERSION);
 embed.setDescription("powered by https://ilovemusic.de/\nThe free german internet radio!");
 embed.setColor('DarkPurple');
 
@@ -10,7 +10,7 @@ const selectMenuActionRow = new ActionRowBuilder<StringSelectMenuBuilder>();
 const selectMenu = new StringSelectMenuBuilder()
 selectMenu.setCustomId('genre_selector')
 selectMenu.setPlaceholder('Select a genre')
-selectMenu.addOptions(data.optionsArray);
+selectMenu.addOptions(Data.optionsArray);
 selectMenuActionRow.addComponents(selectMenu);
 
 

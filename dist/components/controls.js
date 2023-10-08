@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const data_1 = __importDefault(require("../data"));
 const embed = new discord_js_1.EmbedBuilder();
-embed.setTitle("Rythma Radio Player (BETA)");
+embed.setTitle("Rythma Radio Player v." + data_1.default.VERSION);
 embed.setDescription("powered by https://ilovemusic.de/\nThe free german internet radio!");
 embed.setColor('DarkPurple');
 const selectMenuActionRow = new discord_js_1.ActionRowBuilder();

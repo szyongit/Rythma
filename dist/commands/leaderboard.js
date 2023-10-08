@@ -53,7 +53,7 @@ async function execute(client, interaction) {
                 thumbnailURL: client.user?.avatarURL({ size: 64 }),
                 timestamp: true
             })] }).then((message) => {
-        setTimeout(() => message.delete(), 3500);
+        setTimeout(() => message.delete().catch(() => { }), 5000);
     });
 }
 exports.default = {

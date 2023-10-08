@@ -29,7 +29,7 @@ async function execute(client, interaction) {
                 message: `Playtime:\n${(Math.floor(time / 1000 / 60 / 60 / 24))} Days, ${((Math.floor(time / 1000 / 60 / 60) % 60))} Hours, ${((Math.floor(time / 1000 / 60) % 60))} Minutes, ${(Math.floor((time / 1000) % 60))} Seconds`,
                 thumbnailURL: guildThumbnail
             })] }).then((message) => {
-        setTimeout(() => message.delete(), 3500);
+        setTimeout(() => message.delete().catch(() => { }), 5000);
     });
 }
 exports.default = {

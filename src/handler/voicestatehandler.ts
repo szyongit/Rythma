@@ -1,15 +1,16 @@
 import { Client, VoiceState } from "discord.js";
 
 import DatabaseHandler from "./databasehandler";
+import AudioHandler from "./audiohandler";
 
-async function checkStates(oldState:VoiceState, newState:VoiceState) {
-    //deaf
+async function checkStates(client:Client, oldState:VoiceState, newState:VoiceState) {
+    //deafened
     if(newState.deaf) {
         await saveListeningTime(newState);
         return;
     }
 
-    //listening
+    //not deafened
     if(!newState.deaf) {
         await saveJoinTime(newState);
         return;
@@ -78,5 +79,5 @@ export default {handle: async function handle(client:Client, oldState:VoiceState
     }
     if(!newState.channel?.members.has(client.user?.id || "")) return;
 
-    await checkStates(oldState, newState);
+    await checkStates(client, oldState, newState);
 }}

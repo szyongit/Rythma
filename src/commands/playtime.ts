@@ -28,11 +28,11 @@ async function execute(client: Client, interaction: ChatInputCommandInteraction)
     const guildThumbnail = interaction.guild?.iconURL({size:128}) || client.user?.avatarURL({size:128});
 
     interaction.reply({ embeds: [ReplyEmbed.build({
-        title:interaction.guild?.name || "Guild", 
+        title:interaction.guild?.name || "Guild",
         message:`Playtime:\n${(Math.floor(time/1000/60/60/24))} Days, ${((Math.floor(time/1000/60/60)%60))} Hours, ${((Math.floor(time/1000/60)%60))} Minutes, ${(Math.floor((time/1000)%60))} Seconds`,
         thumbnailURL:guildThumbnail
     })]}).then((message) => {
-        setTimeout(() => message.delete(), 3500);
+        setTimeout(() => message.delete().catch(() => {}), 5000);
     });
 }
 

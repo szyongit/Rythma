@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const databasehandler_1 = __importDefault(require("./databasehandler"));
-async function checkStates(oldState, newState) {
-    //deaf
+async function checkStates(client, oldState, newState) {
+    //deafened
     if (newState.deaf) {
         await saveListeningTime(newState);
         return;
     }
-    //listening
+    //not deafened
     if (!newState.deaf) {
         await saveJoinTime(newState);
         return;
@@ -70,5 +70,5 @@ exports.default = { handle: async function handle(client, oldState, newState) {
         }
         if (!newState.channel?.members.has(client.user?.id || ""))
             return;
-        await checkStates(oldState, newState);
+        await checkStates(client, oldState, newState);
     } };
