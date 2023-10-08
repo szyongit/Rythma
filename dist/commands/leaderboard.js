@@ -12,7 +12,9 @@ const command = new discord_js_1.SlashCommandBuilder()
 async function execute(client, interaction) {
     const guildId = interaction.guildId;
     if (!guildId) {
-        interaction.reply({ embeds: [replyembed_1.default.build({ title: "This command can only be used inside of servers!", isError: true })] });
+        interaction.reply({ embeds: [replyembed_1.default.build({ title: "This command can only be used inside of servers!", isError: true })] })
+            .then(message => setTimeout(() => message.delete(), 3000));
+        ;
         return;
     }
     const doc = await databasehandler_1.default.PlayTime.findOne({ guild: guildId }).exec();
@@ -21,6 +23,10 @@ async function execute(client, interaction) {
         return;
     }
     let data = [];
+    if (doc.users.length <= 0) {
+        interaction.reply({ embeds: [replyembed_1.default.build({ title: "No user has listened yet!", isError: true })], ephemeral: true });
+        return;
+    }
     const now = Date.now();
     doc.users.forEach((elements) => {
         data.push({ id: elements.id, time: ((elements.time || 0) + (now - (elements.joinTime || now))) });
@@ -29,7 +35,6 @@ async function execute(client, interaction) {
     let userIndex = data.findIndex((element) => element.id == interaction.user.id);
     let string = "";
     for (let i = userIndex - 3; i < userIndex + 3; i++) {
-        console.log(i + ": " + data[i]);
         if (!data[i])
             continue;
         if (i === userIndex) {

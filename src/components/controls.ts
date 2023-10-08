@@ -10,9 +10,7 @@ const selectMenuActionRow = new ActionRowBuilder<StringSelectMenuBuilder>();
 const selectMenu = new StringSelectMenuBuilder()
 selectMenu.setCustomId('genre_selector')
 selectMenu.setPlaceholder('Select a genre')
-selectMenu.addOptions(
-    data.optionsArray
-);
+selectMenu.addOptions(data.optionsArray);
 selectMenuActionRow.addComponents(selectMenu);
 
 

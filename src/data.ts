@@ -1,7 +1,3 @@
-/*
-This file is only used until database is implemented!
-*/
-
 let channelsData = [
     { name: "dance", value: "https://streams.ilovemusic.de/iloveradio1.mp3" },
     { name: "2000s", value: "https://streams.ilovemusic.de/iloveradio37.mp3" },
@@ -46,12 +42,19 @@ let optionsArray = [
 ]
 
 const channelsMap = new Map(channelsData.map((element) => [element.name, element.value]));
+let lockedChannel:string|undefined = undefined;
 
-type PlayTime = {lastStart:number | undefined, time?:number};
-const playTimeMap = new Map<string, PlayTime>();
+function setLockedChannel(channel:string|undefined) {
+    lockedChannel = channel;
+}
+function getLockedChannel():string|undefined {
+    return lockedChannel;
+}
+
 
 export default {
     channelsMap:channelsMap,
     optionsArray:optionsArray,
-    playTimeMap:playTimeMap
+    setLockedChannel:setLockedChannel,
+    getLockedChannel:getLockedChannel
 };

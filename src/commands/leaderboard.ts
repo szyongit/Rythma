@@ -10,7 +10,8 @@ const command = new SlashCommandBuilder()
 async function execute(client: Client, interaction: ChatInputCommandInteraction) {
     const guildId = interaction.guildId;
     if(!guildId) {
-        interaction.reply({ embeds: [ReplyEmbed.build({title:"This command can only be used inside of servers!", isError:true})]});
+        interaction.reply({ embeds: [ReplyEmbed.build({title:"This command can only be used inside of servers!", isError:true})]})
+        .then(message => setTimeout(() => message.delete(), 3000));;
         return;
     }
 
@@ -24,6 +25,11 @@ async function execute(client: Client, interaction: ChatInputCommandInteraction)
     type ListeningTime = {id:string, time:number};
     let data:ListeningTime[] = [];
 
+    if(doc.users.length <= 0) {
+        interaction.reply({ embeds: [ReplyEmbed.build({title:"No user has listened yet!", isError:true})] , ephemeral:true});
+        return;
+    }
+
     const now = Date.now();
 
     doc.users.forEach((elements) => {
@@ -35,7 +41,6 @@ async function execute(client: Client, interaction: ChatInputCommandInteraction)
 
     let string:string = "";
     for(let i = userIndex - 3; i < userIndex + 3; i++) {
-        console.log(i + ": " + data[i]);
         if(!data[i]) continue;
 
         if(i === userIndex) {

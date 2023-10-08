@@ -60,9 +60,25 @@ const playTimeData = mongoose.model("Playtime", new mongoose.Schema({
     },
     users: [Users]
 }));
+const controlsData = mongoose.model("Control", new mongoose.Schema({
+    guild: {
+        type: String,
+        required: true
+    },
+    channel: {
+        type: String
+    },
+    message: {
+        type: String
+    },
+    lock: {
+        type: Boolean
+    }
+}));
 exports.default = {
     connectToDB: connectToDB,
     isConnected: isConnected,
     connection: mongoose.connection,
-    PlayTime: playTimeData
+    PlayTime: playTimeData,
+    ControlsData: controlsData
 };

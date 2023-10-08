@@ -5,6 +5,9 @@ import DatabaseHandler from './handler/databasehandler';
 
 import Commandhandler from './handler/commandhandler';
 import ComponentHandler from './handler/componenthandler';
+import VoiceStateHandler from './handler/voicestatehandler';
+
+import Data from './data';
 
 config({path:'../.env'});
 
@@ -65,11 +68,26 @@ async function updatePresence() {
                 status:'online',
                 activities:[{name:'ilovemusic.de', type:ActivityType.Listening}],
             });
-            presenceState = 0;
+            presenceState = 2;
+            return;
+        }
+
+        if(presenceState == 2) {
+            const time:number = (client.uptime || 0) / 1000;
+            let string = "";
+            string = (((time)%60).toFixed(0) + " seconds");
+            if(time >= 60) string = (((time/60)%60).toFixed(0) + " minutes");
+            if(time >= 60*60) string = (((time/60/60)).toFixed(1) + " hours");
+
+            client.user?.setPresence({
+                status:'online',
+                activities:[{name:`online for ${string} now`, type:ActivityType.Playing}],
+            });
+            presenceState = 3;
             return;
         }
         
-    }, 12000);
+    }, 12500);
 }
 
 client.on('ready', (client) => {
@@ -83,60 +101,16 @@ client.on('interactionCreate', async (interaction) => {
         ComponentHandler.handle(client, interaction);
     }
 });
-
 client.on('voiceStateUpdate', async (oldState, newState) => {
-    if(newState.member?.user == client.user) return;
-    if(!newState.channel?.members.has(client.user?.id || "")) return;
-
-    //deaf
-    if(newState.deaf) {
-        saveListeningTime(oldState, newState);
-        return;
-    }
-
-    //listening
-    if(!newState.deaf) {
-        saveJoinTime(oldState, newState);
-        return;
-    }
-
-    //User joins the channel
-    if(!oldState.channel && newState.channel && !newState.deaf) {
-        await saveJoinTime(oldState, newState);
-        return;
-    }
-
-    //User leaves the channel
-    if(oldState.channel && !newState.channel) {
-        await saveListeningTime(oldState, newState);
-        return;
-    }
+    await VoiceStateHandler.handle(client, oldState, newState);
 });
+client.on('messageCreate', async (message) => {
+    if(!Data.getLockedChannel()) return;
+    if(message.author.id === client.user?.id) return;
+    if(message.channel.id !== Data.getLockedChannel()) return;
+    if(!message.deletable) return;
 
-async function saveJoinTime(oldState:VoiceState, newState:VoiceState) {
-    const doc = await DatabaseHandler.PlayTime.findOne({guild:newState.guild.id, "users.id":newState.member?.id}).exec();
-    if(!doc) {
-        await DatabaseHandler.PlayTime.updateOne({guild:newState.guild.id}, {$push: {users:{id:newState.member?.id, joinTime:Date.now()}}}, {upsert:true}).exec();
-        return;
-    }
-
-    await DatabaseHandler.PlayTime.updateOne({guild:newState.guild.id, "users.id":`${newState.member?.id}`}, {$set: {"users.$.joinTime":Date.now()}}).exec();
-}
-
-async function saveListeningTime(oldState:VoiceState, newState:VoiceState) {
-    const doc = await DatabaseHandler.PlayTime.findOne({guild:oldState.guild.id, "users.id":`${newState.member?.id}`}).exec();
-    if(!doc) return;
-
-    const userDatas = doc.users.filter((element) => element.id == oldState.member?.id);
-    if(userDatas.length < 1) return;
-    
-    const userData = userDatas[0];
-    const joinTime = userData.joinTime;
-
-    const now = Date.now();
-    const listeningTime = (doc.time || 0) + (now - (joinTime || now));
-
-    await DatabaseHandler.PlayTime.updateOne({guild:newState.guild.id, "users.id":`${newState.member?.id}`}, {$set: {"users.$.time":listeningTime}, $unset:{"users.$.joinTime":""}}, {upsert:true}).exec();
-}
+    message.delete();
+})
 
 main();

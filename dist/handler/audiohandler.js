@@ -119,16 +119,12 @@ function connectToVoiceChannel(channelId, guildId, adapterCreator) {
     });
     return connection;
 }
-function isPlaying(guild) {
-    return playerMap.get(guild)?.player.state.status === voice_1.AudioPlayerStatus.Playing;
-}
 exports.default = {
     play: play,
     stop: stop,
     pause: pause,
     unpause: unpause,
     getData: getData,
-    isPlaying: isPlaying,
     loadResource: loadResource,
     connectToVoiceChannel: connectToVoiceChannel
 };
