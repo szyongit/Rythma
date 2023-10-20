@@ -51,7 +51,11 @@ async function execute(client:Client, interaction:ChatInputCommandInteraction) {
 
             await DatabaseHandler.ControlsData.updateOne({guild:guildId}, {channel:messageChannel.id, message:newMessage.id, lock:doc.lock}, {upsert:true}).exec()
             .then(() => {
-                Data.setChannelLocked((!doc.lock ? undefined : messageChannel.id));
+                if(doc.lock) {
+                    Data.lockChannel(messageChannel.id);
+                } else {
+                    Data.unlockChannel(messageChannel.id);
+                }
 
                 interaction.reply({embeds:[ReplyEmbed.build({title:"Controls are now shown inside of <#" + messageChannel.id + ">!"})]})
                 .then(message => setTimeout(() => message.delete().catch(() => {}), 3000));
@@ -95,7 +99,12 @@ async function execute(client:Client, interaction:ChatInputCommandInteraction) {
     const locked = ((lockChannel == undefined) ? (!doc?.lock ? false : doc.lock) : lockChannel);
     await DatabaseHandler.ControlsData.updateOne({guild:guildId}, {channel:channel.id, message:message.id, lock:locked}, {upsert:true}).exec()
     .then(() => {
-        Data.setChannelLocked((!locked ? undefined : newChannel.id));
+        if(locked) {
+            Data.lockChannel(channel.id);
+        } else {
+            Data.unlockChannel(channel.id);
+        }
+
         if(interaction.replied) {
             interaction.editReply({embeds:[ReplyEmbed.build({title:"Controls are now shown inside of <#" + newChannel.id + ">!"})]})
             .then(message => setTimeout(() => message.delete(), 3000));

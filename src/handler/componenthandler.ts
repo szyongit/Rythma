@@ -13,7 +13,10 @@ async function handle(client: Client, interaction: Interaction) {
 
     const isVoiceChannelConnected = (<GuildMember>interaction.member).voice;
     const channelId = isVoiceChannelConnected.channelId;
-    if (!channelId) return;
+    if (!channelId) {
+        //TODO: send reply!
+        return;
+    }
 
     const guildId = interaction.guildId;
     if (!guildId) {
@@ -27,13 +30,13 @@ async function handle(client: Client, interaction: Interaction) {
 
         if(value === 'none') {
             AudioHandler.stop(guildId);
-            interaction.reply({ embeds: [Replyembed.build({ title: 'Stopped playing!', color:'Red' })], ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [Replyembed.build({ title: 'Stopped playing!', color:'Red' })], ephemeral: true }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
             return;
         }
 
         const url = data.channelsMap.get(value);
         if (!url) {
-            interaction.reply({ embeds: [Replyembed.build({ title: 'This genre is not implemented yet!', isError: true })], ephemeral: true }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [Replyembed.build({ title: 'This genre is not implemented yet!', isError: true })], ephemeral: true }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
             return;
         }
 
@@ -44,13 +47,13 @@ async function handle(client: Client, interaction: Interaction) {
 
         const audioData = AudioHandler.getData(guildId);
         if (!audioData) {
-            interaction.editReply({ embeds: [Replyembed.build({ title: 'OOPS, an error occured!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.editReply({ embeds: [Replyembed.build({ title: 'OOPS, an error occured!', isError: true })] }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
             AudioHandler.stop(guildId);
             return;
         }
 
         connection.subscribe(audioData.player);
-        interaction.editReply({ embeds: [Replyembed.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
+        interaction.editReply({ embeds: [Replyembed.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
         return;
     }
 
@@ -58,7 +61,7 @@ async function handle(client: Client, interaction: Interaction) {
         if (interaction.customId === 'play_button') {
             const audioData = AudioHandler.getData(guildId);
             if (!audioData || !audioData.resource) {
-                interaction.reply({ embeds: [Replyembed.build({ title: 'Please select a genre to play!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+                interaction.reply({ embeds: [Replyembed.build({ title: 'Please select a genre to play!', isError: true })] }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
                 return;
             }
 
@@ -68,37 +71,37 @@ async function handle(client: Client, interaction: Interaction) {
             AudioHandler.play(guildId, audioData.resource);
             connection.subscribe(audioData.player);
 
-            interaction.editReply({ embeds: [Replyembed.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.editReply({ embeds: [Replyembed.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
             return;
         }
         if (interaction.customId === 'pause_button') {
             const paused = AudioHandler.pause(guildId);
             if (!paused) {
-                interaction.reply({ embeds: [Replyembed.build({ title: 'OOPS, an error occured!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+                interaction.reply({ embeds: [Replyembed.build({ title: 'OOPS, an error occured!', isError: true })] }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
                 return;
             }
 
-            interaction.reply({ embeds: [Replyembed.build({ title: '⏸', color: 'Grey' })] }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [Replyembed.build({ title: '⏸', color: 'Grey' })] }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
             return;
         }
         if (interaction.customId === 'stop_button') {
             const stopped = AudioHandler.stop(guildId);
             if (!stopped) return;
 
-            interaction.reply({ embeds: [Replyembed.build({ title: '⏹', color: 'Red' })] }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [Replyembed.build({ title: '⏹', color: 'Red' })] }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
             return;
         }
         if (interaction.customId === 'leave_button') {
             const connection = getVoiceConnection(guildId);
             if (!connection) {
-                interaction.reply({ embeds: [Replyembed.build({ title: 'I\'m in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete(), 2500));
+                interaction.reply({ embeds: [Replyembed.build({ title: 'I\'m in no voicechannel!', isError: true })] }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
                 return;
             }
 
             AudioHandler.stop(guildId);
             connection.disconnect();
             connection.destroy();
-            interaction.reply({ embeds: [Replyembed.build({ title: ':wave:' })] }).then(message => setTimeout(() => message.delete(), 2500));
+            interaction.reply({ embeds: [Replyembed.build({ title: ':wave:' })] }).then(message => setTimeout(() => message.delete().catch(() => {}), 2500));
             return;
         }
     }

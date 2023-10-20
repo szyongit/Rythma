@@ -18,12 +18,8 @@ async function execute(client, interaction) {
         return;
     }
     const doc = await databasehandler_1.default.PlayTime.findOne({ guild: guildId }).exec();
-    if (!doc) {
-        interaction.reply({ embeds: [replyembed_1.default.build({ title: "Could not load data from database!", isError: true })], ephemeral: true });
-        return;
-    }
     let data = [];
-    if (doc.users.length <= 0) {
+    if (!doc || doc.users.length <= 0) {
         interaction.reply({ embeds: [replyembed_1.default.build({ title: "No user has listened yet!", isError: true })], ephemeral: true });
         return;
     }

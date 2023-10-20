@@ -17,15 +17,10 @@ async function execute(client: Client, interaction: ChatInputCommandInteraction)
 
     const doc = await DatabaseHandler.PlayTime.findOne({guild:guildId}).exec();
 
-    if(!doc) {
-        interaction.reply({ embeds: [ReplyEmbed.build({title:"Could not load data from database!", isError:true})] , ephemeral:true});
-        return;
-    }
-
     type ListeningTime = {id:string, time:number};
     let data:ListeningTime[] = [];
 
-    if(doc.users.length <= 0) {
+    if(!doc || doc.users.length <= 0) {
         interaction.reply({ embeds: [ReplyEmbed.build({title:"No user has listened yet!", isError:true})] , ephemeral:true});
         return;
     }

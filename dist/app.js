@@ -17,10 +17,10 @@ console.log("Loading voicestate handler...");
 const voicestatehandler_1 = __importDefault(require("./handler/voicestatehandler"));
 console.log("Loading environment variables...");
 (0, dotenv_1.config)({ path: '../.env' });
-console.log();
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || "";
 const DISCORD_BOT_CLIENT_ID = process.env.DISCORD_BOT_CLIENT_ID || "";
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID || "";
+console.log();
 const rest = new discord_js_1.REST().setToken(DISCORD_BOT_TOKEN);
 const client = new discord_js_1.Client({
     intents: [
@@ -88,7 +88,7 @@ async function updatePresence() {
                 status: 'online',
                 activities: [{ name: `online for ${string} now`, type: discord_js_1.ActivityType.Playing }],
             });
-            presenceState = 3;
+            presenceState = 0;
             return;
         }
     }, 12500);

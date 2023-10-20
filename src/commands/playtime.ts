@@ -10,14 +10,15 @@ const command = new SlashCommandBuilder()
 async function execute(client: Client, interaction: ChatInputCommandInteraction) {
     const guildId = interaction.guildId;
     if(!guildId) {
-        interaction.reply({ embeds: [ReplyEmbed.build({title:"This command can only be used inside of servers!", isError:true})]});
+        interaction.reply({ embeds: [ReplyEmbed.build({title:"This command can only be used inside of servers!", isError:true})]})
+        .then((message) => setTimeout(() => message.delete().catch(() => {}), 5000));
         return;
     }
 
     const doc = await DatabaseHandler.PlayTime.findOne({guild:guildId}).exec();
 
     if(!doc) {
-        interaction.reply({ embeds: [ReplyEmbed.build({title:"Could not load data from database!", isError:true})] , ephemeral:true});
+        interaction.reply({ embeds: [ReplyEmbed.build({title:"Rythma has not played yet!", isError:true})] , ephemeral:true});
         return;
     }
 

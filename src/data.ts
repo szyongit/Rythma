@@ -46,19 +46,26 @@ let optionsArray = [
 ]
 
 const channelsMap = new Map(channelsData.map((element) => [element.name, element.value]));
-let lockedChannels:string[]= [];
+let lockedChannels:Map<string, boolean> = new Map<string, boolean>();
 
 async function init() {
     let dbData = await DatabaseHandler.ControlsData.find({}).select("channel message -_id").exec();
-    lockedChannels = <string[]> dbData.filter((data) => data.channel != undefined).flatMap((data) => data.channel);
+    const array = <string[]> dbData.filter((data) => data.channel != undefined && data.lock === true).flatMap((data) => data.channel);
+    array.forEach((element) => lockedChannels.set(element, true));
 }
 
-function setChannelLocked(channel:string|undefined) {
+function lockChannel(channel:string|undefined) {
     if(!channel) return;
-    lockedChannels.push(channel);
+    lockedChannels.set(channel, true);
+}
+function unlockChannel(channel:string|undefined) {
+    if(!channel) return;
+    lockedChannels.delete(channel);
 }
 function getLockedChannels():string[] {
-    return lockedChannels;
+    const array:string[] = [];
+    lockedChannels.forEach((value, key) => array.push(key));
+    return array;
 }
 
 
@@ -66,7 +73,8 @@ export default {
     VERSION:VERSION,
     channelsMap:channelsMap,
     optionsArray:optionsArray,
-    setChannelLocked:setChannelLocked,
+    lockChannel:lockChannel,
+    unlockChannel:unlockChannel,
     getLockedChannels:getLockedChannels,
     init:init
 };

@@ -23,7 +23,6 @@ async function execute(client, interaction) {
             .then(() => success = success && true)
             .catch(() => success = success && false);
     });
-    success = false;
     if (success) {
         interaction.reply({ embeds: [replyembed_1.default.build({ title: "Your data was deleted successfully!", color: 'Green' })], ephemeral: true })
             .then((message) => setTimeout(() => message.delete().catch(() => { }), 3000));

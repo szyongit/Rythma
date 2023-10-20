@@ -48,24 +48,33 @@ let optionsArray = [
     { label: 'NONE', value: 'none' }
 ];
 const channelsMap = new Map(channelsData.map((element) => [element.name, element.value]));
-let lockedChannels = [];
+let lockedChannels = new Map();
 async function init() {
     let dbData = await databasehandler_1.default.ControlsData.find({}).select("channel message -_id").exec();
-    lockedChannels = dbData.filter((data) => data.channel != undefined).flatMap((data) => data.channel);
+    const array = dbData.filter((data) => data.channel != undefined && data.lock === true).flatMap((data) => data.channel);
+    array.forEach((element) => lockedChannels.set(element, true));
 }
-function setChannelLocked(channel) {
+function lockChannel(channel) {
     if (!channel)
         return;
-    lockedChannels.push(channel);
+    lockedChannels.set(channel, true);
+}
+function unlockChannel(channel) {
+    if (!channel)
+        return;
+    lockedChannels.delete(channel);
 }
 function getLockedChannels() {
-    return lockedChannels;
+    const array = [];
+    lockedChannels.forEach((value, key) => array.push(key));
+    return array;
 }
 exports.default = {
     VERSION: VERSION,
     channelsMap: channelsMap,
     optionsArray: optionsArray,
-    setChannelLocked: setChannelLocked,
+    lockChannel: lockChannel,
+    unlockChannel: unlockChannel,
     getLockedChannels: getLockedChannels,
     init: init
 };

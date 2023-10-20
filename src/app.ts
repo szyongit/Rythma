@@ -19,11 +19,11 @@ import VoiceStateHandler from './handler/voicestatehandler';
 console.log("Loading environment variables...")
 config({path:'../.env'});
 
-console.log();
-
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || "";
 const DISCORD_BOT_CLIENT_ID = process.env.DISCORD_BOT_CLIENT_ID || "";
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID || "";
+
+console.log();
 
 const rest = new REST().setToken(DISCORD_BOT_TOKEN);
 const client = new Client({
@@ -98,7 +98,7 @@ async function updatePresence() {
                 status:'online',
                 activities:[{name:`online for ${string} now`, type:ActivityType.Playing}],
             });
-            presenceState = 3;
+            presenceState = 0;
             return;
         }
         
@@ -106,7 +106,7 @@ async function updatePresence() {
 }
 
 client.on('ready', (client) => {
-    console.log(`\x1b[32m${client.user.tag} is now running!\x1b[0m\n`)
+    console.log(`\x1b[32m${client.user.tag} is now running!\x1b[0m\n`);
     updatePresence();
 });
 client.on('interactionCreate', async (interaction) => {

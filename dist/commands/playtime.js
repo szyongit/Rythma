@@ -12,12 +12,13 @@ const command = new discord_js_1.SlashCommandBuilder()
 async function execute(client, interaction) {
     const guildId = interaction.guildId;
     if (!guildId) {
-        interaction.reply({ embeds: [replyembed_1.default.build({ title: "This command can only be used inside of servers!", isError: true })] });
+        interaction.reply({ embeds: [replyembed_1.default.build({ title: "This command can only be used inside of servers!", isError: true })] })
+            .then((message) => setTimeout(() => message.delete().catch(() => { }), 5000));
         return;
     }
     const doc = await databasehandler_1.default.PlayTime.findOne({ guild: guildId }).exec();
     if (!doc) {
-        interaction.reply({ embeds: [replyembed_1.default.build({ title: "Could not load data from database!", isError: true })], ephemeral: true });
+        interaction.reply({ embeds: [replyembed_1.default.build({ title: "Rythma has not played yet!", isError: true })], ephemeral: true });
         return;
     }
     const now = Date.now();
