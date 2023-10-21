@@ -59,6 +59,7 @@ async function main() {
         console.log('Logging in...');
         client.login(DISCORD_BOT_TOKEN);
     } catch(err) {
+        console.log("OOPS, an error occured!");
         console.log(err);
     };
 }
