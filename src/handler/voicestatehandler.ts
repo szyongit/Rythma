@@ -1,15 +1,16 @@
 import { Client, VoiceState } from "discord.js";
 
 import DatabaseHandler from "./databasehandler";
+import AudioHandler from "./audiohandler";
 
-async function saveJoinTime(newState:VoiceState) {
-    const doc = await DatabaseHandler.PlayTime.findOne({guild:newState.guild.id, "users.id":newState.member?.id}).exec();
+async function saveJoinTime(voiceState:VoiceState) {
+    const doc = await DatabaseHandler.PlayTime.findOne({guild:voiceState.guild.id, "users.id":voiceState.member?.id}).exec();
     if(!doc) {
-        await DatabaseHandler.PlayTime.updateOne({guild:newState.guild.id}, {$push: {users:{id:newState.member?.id, joinTime:Date.now()}}}, {upsert:true}).exec();
+        await DatabaseHandler.PlayTime.updateOne({guild:voiceState.guild.id}, {$push: {users:{id:voiceState.member?.id, joinTime:Date.now()}}}, {upsert:true}).exec();
         return;
     }
 
-    await DatabaseHandler.PlayTime.updateOne({guild:newState.guild.id, "users.id":`${newState.member?.id}`}, {$set: {"users.$.joinTime":Date.now()}}).exec();
+    await DatabaseHandler.PlayTime.updateOne({guild:voiceState.guild.id, "users.id":`${voiceState.member?.id}`}, {$set: {"users.$.joinTime":Date.now()}}).exec();
 }
 
 async function saveListeningTime(voiceState:VoiceState) {
@@ -23,32 +24,34 @@ async function saveListeningTime(voiceState:VoiceState) {
     const joinTime = userData.joinTime;
 
     const now = Date.now();
-    const listeningTime = (doc.time || 0) + (now - (joinTime || now));
+    const listeningTime = (userData.time || 0) + (now - (joinTime || now));
 
     await DatabaseHandler.PlayTime.updateOne({guild:voiceState.guild.id, "users.id":`${voiceState.member?.id}`}, {$set: {"users.$.time":listeningTime}, $unset:{"users.$.joinTime":""}}, {upsert:true}).exec();
 }
 
 async function checkStates(client:Client, oldState:VoiceState, newState:VoiceState) {
+    if(!client.user) return;
+
     //deafened
-    if(!oldState.deaf && newState.deaf && !newState.channel?.members.has(client.user?.id || "")) {
+    if(!oldState.deaf && newState.deaf && newState.channel?.members.has(client.user?.id)) {
         await saveListeningTime(newState);
         return;
     }
 
     //not deafened
-    if(oldState.deaf && !newState.deaf && !newState.channel?.members.has(client.user?.id || "")) {
+    if(oldState.deaf && !newState.deaf && newState.channel?.members.has(client.user?.id)) {
         await saveJoinTime(newState);
         return;
     }
 
     //User joins the channel
-    if(!oldState.channel && newState.channel && !newState.deaf && !newState.channel?.members.has(client.user?.id || "")) {
+    if(!oldState.channel && newState.channel && !newState.deaf && newState.channel?.members.has(client.user?.id)) {
         await saveJoinTime(newState);
         return;
     }
 
     //User leaves the channel
-    if(oldState.channel && !newState.channel && !oldState.channel?.members.has(client.user?.id || "")) {
+    if(oldState.channel && !newState.channel && oldState.channel?.members.has(client.user?.id)) {
         await saveListeningTime(newState);
         return;
     }
@@ -57,8 +60,8 @@ async function checkStates(client:Client, oldState:VoiceState, newState:VoiceSta
 export default {handle: async function handle(client:Client, oldState:VoiceState, newState:VoiceState) {
     if(newState.member?.user == client.user) {
         //Rythma logic
-        if(!oldState.channel && newState.channel) {
-            //Rythma joins
+        //Rythma joins
+        if(!oldState.channel && newState.channel && !newState.mute) {
             newState.channel.members.forEach(async (member) => {
                 if(member.voice.deaf) return;
                 await saveJoinTime(member.voice);
@@ -66,27 +69,30 @@ export default {handle: async function handle(client:Client, oldState:VoiceState
             return;
         }
 
+        //Rythma leaves
         if(oldState.channel && !newState.channel) {
-            //Rythma leaves
             oldState.channel.members.forEach(async (member) => {
                 await saveListeningTime(member.voice);
             })
             return;
         }
 
-        if(!oldState.deaf && newState.deaf && newState.channel) {
-            //Rythma get deafened
+        //Rythma gets muted
+        if(!oldState.mute && newState.mute && newState.channel) {
             newState.channel.members.forEach(async (member) => {
                 await saveListeningTime(member.voice);
-            })
+            });
+            AudioHandler.pause(newState.guild.id);
             return;
         }
 
-        if(oldState.deaf && !newState.deaf && newState.channel) {
-            //Rythma get undeafened
+        //Rythma get unmuted
+        if(oldState.mute && !newState.mute && newState.channel) {
             newState.channel.members.forEach(async (member) => {
+                if(member.voice.deaf) return;
                 await saveJoinTime(member.voice);
-            })
+            });
+            AudioHandler.unpause(newState.guild.id);
             return;
         }
 

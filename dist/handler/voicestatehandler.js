@@ -4,13 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const databasehandler_1 = __importDefault(require("./databasehandler"));
-async function saveJoinTime(newState) {
-    const doc = await databasehandler_1.default.PlayTime.findOne({ guild: newState.guild.id, "users.id": newState.member?.id }).exec();
+const audiohandler_1 = __importDefault(require("./audiohandler"));
+async function saveJoinTime(voiceState) {
+    const doc = await databasehandler_1.default.PlayTime.findOne({ guild: voiceState.guild.id, "users.id": voiceState.member?.id }).exec();
     if (!doc) {
-        await databasehandler_1.default.PlayTime.updateOne({ guild: newState.guild.id }, { $push: { users: { id: newState.member?.id, joinTime: Date.now() } } }, { upsert: true }).exec();
+        await databasehandler_1.default.PlayTime.updateOne({ guild: voiceState.guild.id }, { $push: { users: { id: voiceState.member?.id, joinTime: Date.now() } } }, { upsert: true }).exec();
         return;
     }
-    await databasehandler_1.default.PlayTime.updateOne({ guild: newState.guild.id, "users.id": `${newState.member?.id}` }, { $set: { "users.$.joinTime": Date.now() } }).exec();
+    await databasehandler_1.default.PlayTime.updateOne({ guild: voiceState.guild.id, "users.id": `${voiceState.member?.id}` }, { $set: { "users.$.joinTime": Date.now() } }).exec();
 }
 async function saveListeningTime(voiceState) {
     const doc = await databasehandler_1.default.PlayTime.findOne({ guild: voiceState.guild.id, "users.id": `${voiceState.member?.id}` }).exec();
@@ -22,27 +23,29 @@ async function saveListeningTime(voiceState) {
     const userData = userDatas[0];
     const joinTime = userData.joinTime;
     const now = Date.now();
-    const listeningTime = (doc.time || 0) + (now - (joinTime || now));
+    const listeningTime = (userData.time || 0) + (now - (joinTime || now));
     await databasehandler_1.default.PlayTime.updateOne({ guild: voiceState.guild.id, "users.id": `${voiceState.member?.id}` }, { $set: { "users.$.time": listeningTime }, $unset: { "users.$.joinTime": "" } }, { upsert: true }).exec();
 }
 async function checkStates(client, oldState, newState) {
+    if (!client.user)
+        return;
     //deafened
-    if (!oldState.deaf && newState.deaf && !newState.channel?.members.has(client.user?.id || "")) {
+    if (!oldState.deaf && newState.deaf && newState.channel?.members.has(client.user?.id)) {
         await saveListeningTime(newState);
         return;
     }
     //not deafened
-    if (oldState.deaf && !newState.deaf && !newState.channel?.members.has(client.user?.id || "")) {
+    if (oldState.deaf && !newState.deaf && newState.channel?.members.has(client.user?.id)) {
         await saveJoinTime(newState);
         return;
     }
     //User joins the channel
-    if (!oldState.channel && newState.channel && !newState.deaf && !newState.channel?.members.has(client.user?.id || "")) {
+    if (!oldState.channel && newState.channel && !newState.deaf && newState.channel?.members.has(client.user?.id)) {
         await saveJoinTime(newState);
         return;
     }
     //User leaves the channel
-    if (oldState.channel && !newState.channel && !oldState.channel?.members.has(client.user?.id || "")) {
+    if (oldState.channel && !newState.channel && oldState.channel?.members.has(client.user?.id)) {
         await saveListeningTime(newState);
         return;
     }
@@ -50,8 +53,8 @@ async function checkStates(client, oldState, newState) {
 exports.default = { handle: async function handle(client, oldState, newState) {
         if (newState.member?.user == client.user) {
             //Rythma logic
-            if (!oldState.channel && newState.channel) {
-                //Rythma joins
+            //Rythma joins
+            if (!oldState.channel && newState.channel && !newState.mute) {
                 newState.channel.members.forEach(async (member) => {
                     if (member.voice.deaf)
                         return;
@@ -59,25 +62,29 @@ exports.default = { handle: async function handle(client, oldState, newState) {
                 });
                 return;
             }
+            //Rythma leaves
             if (oldState.channel && !newState.channel) {
-                //Rythma leaves
                 oldState.channel.members.forEach(async (member) => {
                     await saveListeningTime(member.voice);
                 });
                 return;
             }
-            if (!oldState.deaf && newState.deaf && newState.channel) {
-                //Rythma get deafened
+            //Rythma gets muted
+            if (!oldState.mute && newState.mute && newState.channel) {
                 newState.channel.members.forEach(async (member) => {
                     await saveListeningTime(member.voice);
                 });
+                audiohandler_1.default.pause(newState.guild.id);
                 return;
             }
-            if (oldState.deaf && !newState.deaf && newState.channel) {
-                //Rythma get undeafened
+            //Rythma get unmuted
+            if (oldState.mute && !newState.mute && newState.channel) {
                 newState.channel.members.forEach(async (member) => {
+                    if (member.voice.deaf)
+                        return;
                     await saveJoinTime(member.voice);
                 });
+                audiohandler_1.default.unpause(newState.guild.id);
                 return;
             }
             return;

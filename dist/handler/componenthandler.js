@@ -15,7 +15,10 @@ async function handle(client, interaction) {
     const isVoiceChannelConnected = interaction.member.voice;
     const channelId = isVoiceChannelConnected.channelId;
     if (!channelId) {
-        //TODO: send reply!
+        if (!interaction.isStringSelectMenu() && !interaction.isButton())
+            return;
+        interaction.reply({ embeds: [replyembed_1.default.build({ title: "You have to be in a voice channel!", isError: true })] })
+            .then((message) => setTimeout(() => message.delete().catch(() => { }), 5000));
         return;
     }
     const guildId = interaction.guildId;

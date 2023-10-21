@@ -1,4 +1,4 @@
-import { Client, REST, GatewayIntentBits, Routes, ActivityType, VoiceState } from 'discord.js';
+import { Client, REST, GatewayIntentBits, Routes, ActivityType, CommandInteraction } from 'discord.js';
 import { config } from 'dotenv';
 
 console.log("Loading database handler...");
