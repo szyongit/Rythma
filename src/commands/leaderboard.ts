@@ -42,9 +42,11 @@ async function execute(client: Client, interaction: ChatInputCommandInteraction)
             string += "\n";
         }
 
+        const index = i+1;
+        const indexDisplay = (index === 1 ? ":first_place:" : (index === 2 ? ":second_place:" : (index === 3 ? ":third_place:" : (index + ")")))); 
         const user = `<@${data[i].id}> `;
         const timeString = `${Math.floor(data[i].time/1000/60/60)} Hours, ${(Math.floor(data[i].time/1000/60)%60)} Minutes, ${(Math.floor(data[i].time/1000) % 60)} Seconds`;
-        string += `${i+1}) ${user} - ${timeString}\n`;
+        string += `${indexDisplay} ${user} - ${timeString}\n`;
 
         if(i === userIndex) {
             string += "\n";
