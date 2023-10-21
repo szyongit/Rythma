@@ -46,7 +46,7 @@ function play(guild, audioResource) {
     if (!playerData?.resource)
         return false;
     const resource = loadResource(playerData.resource);
-    resource.volume?.setVolume(0.75);
+    resource.volume?.setVolume(0.5);
     databasehandler_1.default.PlayTime.findOne({ guild: guild }).exec().then((doc) => {
         if (!doc) {
             databasehandler_1.default.PlayTime.updateOne({ guild: guild }, { lastStart: Date.now(), playing: true }, { upsert: true }).exec();
@@ -78,7 +78,7 @@ function pause(guild) {
         const newTime = (doc.time || 0) + (now - (doc.lastStart || now));
         databasehandler_1.default.PlayTime.updateOne({ guild: guild }, { time: newTime, playing: false }).exec();
     });
-    playerData?.player.pause();
+    playerData.player.pause();
     return true;
 }
 function unpause(guild) {

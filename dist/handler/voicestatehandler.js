@@ -50,12 +50,17 @@ async function checkStates(client, oldState, newState) {
         return;
     }
 }
-exports.default = { handle: async function handle(client, oldState, newState) {
+exports.default = {
+    saveJoinTime: saveJoinTime,
+    saveListeningTime: saveListeningTime,
+    handle: async function handle(client, oldState, newState) {
         if (newState.member?.user == client.user) {
             //Rythma logic
             //Rythma joins
             if (!oldState.channel && newState.channel && !newState.mute) {
                 newState.channel.members.forEach(async (member) => {
+                    if (member.id === client.user?.id)
+                        return;
                     if (member.voice.deaf)
                         return;
                     await saveJoinTime(member.voice);
@@ -65,6 +70,8 @@ exports.default = { handle: async function handle(client, oldState, newState) {
             //Rythma leaves
             if (oldState.channel && !newState.channel) {
                 oldState.channel.members.forEach(async (member) => {
+                    if (member.id === client.user?.id)
+                        return;
                     await saveListeningTime(member.voice);
                 });
                 return;
@@ -72,6 +79,8 @@ exports.default = { handle: async function handle(client, oldState, newState) {
             //Rythma gets muted
             if (!oldState.mute && newState.mute && newState.channel) {
                 newState.channel.members.forEach(async (member) => {
+                    if (member.id === client.user?.id)
+                        return;
                     await saveListeningTime(member.voice);
                 });
                 audiohandler_1.default.pause(newState.guild.id);
@@ -80,6 +89,8 @@ exports.default = { handle: async function handle(client, oldState, newState) {
             //Rythma get unmuted
             if (oldState.mute && !newState.mute && newState.channel) {
                 newState.channel.members.forEach(async (member) => {
+                    if (member.id === client.user?.id)
+                        return;
                     if (member.voice.deaf)
                         return;
                     await saveJoinTime(member.voice);
@@ -90,4 +101,5 @@ exports.default = { handle: async function handle(client, oldState, newState) {
             return;
         }
         await checkStates(client, oldState, newState);
-    } };
+    }
+};

@@ -8,7 +8,7 @@ const databasehandler_1 = __importDefault(require("../handler/databasehandler"))
 const replyembed_1 = __importDefault(require("../components/replyembed"));
 const command = new discord_js_1.SlashCommandBuilder()
     .setName('deletedata')
-    .setDescription('Deletes all of your saved data globally!');
+    .setDescription('Deletes all of your saved data globally (on all servers)!');
 async function execute(client, interaction) {
     const guildId = interaction.guildId;
     if (!guildId) {

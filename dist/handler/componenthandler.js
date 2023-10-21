@@ -7,14 +7,15 @@ const voice_1 = require("@discordjs/voice");
 const data_1 = __importDefault(require("../data"));
 const audiohandler_1 = __importDefault(require("./audiohandler"));
 const replyembed_1 = __importDefault(require("../components/replyembed"));
+const voicestatehandler_1 = __importDefault(require("./voicestatehandler"));
 async function handle(client, interaction) {
     const guild = interaction.guild;
     if (!guild) {
         return;
     }
-    const isVoiceChannelConnected = interaction.member.voice;
-    const channelId = isVoiceChannelConnected.channelId;
-    if (!channelId) {
+    const voiceConnection = interaction.member.voice;
+    const voiceChannel = voiceConnection.channel;
+    if (!voiceChannel || !voiceChannel.id) {
         if (!interaction.isStringSelectMenu() && !interaction.isButton())
             return;
         interaction.reply({ embeds: [replyembed_1.default.build({ title: "You have to be in a voice channel!", isError: true })] })
@@ -41,7 +42,7 @@ async function handle(client, interaction) {
             return;
         }
         await interaction.reply({ embeds: [replyembed_1.default.build({ title: '•••' })] });
-        const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
+        const connection = audiohandler_1.default.connectToVoiceChannel(voiceChannel.id, guildId, guild.voiceAdapterCreator);
         audiohandler_1.default.play(guildId, url);
         const audioData = audiohandler_1.default.getData(guildId);
         if (!audioData) {
@@ -61,25 +62,42 @@ async function handle(client, interaction) {
                 return;
             }
             await interaction.reply({ embeds: [replyembed_1.default.build({ title: '•••' })] });
-            const connection = audiohandler_1.default.connectToVoiceChannel(channelId, guildId, guild.voiceAdapterCreator);
+            const connection = audiohandler_1.default.connectToVoiceChannel(voiceChannel.id, guildId, guild.voiceAdapterCreator);
             audiohandler_1.default.play(guildId, audioData.resource);
             connection.subscribe(audioData.player);
+            voiceChannel.members.forEach(async (member) => {
+                if (member.id === client.user?.id)
+                    return;
+                await voicestatehandler_1.default.saveJoinTime(member.voice);
+            });
             interaction.editReply({ embeds: [replyembed_1.default.build({ title: '▶', color: 'Green' })] }).then(message => setTimeout(() => message.delete().catch(() => { }), 2500));
             return;
         }
         if (interaction.customId === 'pause_button') {
             const paused = audiohandler_1.default.pause(guildId);
             if (!paused) {
-                interaction.reply({ embeds: [replyembed_1.default.build({ title: 'OOPS, an error occured!', isError: true })] }).then(message => setTimeout(() => message.delete().catch(() => { }), 2500));
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: '⏸', color: 'Grey' })] }).then(message => setTimeout(() => message.delete().catch(() => { }), 2500));
                 return;
             }
+            voiceChannel.members.forEach(async (member) => {
+                if (member.id === client.user?.id)
+                    return;
+                await voicestatehandler_1.default.saveListeningTime(member.voice);
+            });
             interaction.reply({ embeds: [replyembed_1.default.build({ title: '⏸', color: 'Grey' })] }).then(message => setTimeout(() => message.delete().catch(() => { }), 2500));
             return;
         }
         if (interaction.customId === 'stop_button') {
             const stopped = audiohandler_1.default.stop(guildId);
-            if (!stopped)
+            if (!stopped) {
+                interaction.reply({ embeds: [replyembed_1.default.build({ title: '⏹', color: 'Red' })] }).then(message => setTimeout(() => message.delete().catch(() => { }), 2500));
                 return;
+            }
+            voiceChannel.members.forEach(async (member) => {
+                if (member.id === client.user?.id)
+                    return;
+                await voicestatehandler_1.default.saveListeningTime(member.voice);
+            });
             interaction.reply({ embeds: [replyembed_1.default.build({ title: '⏹', color: 'Red' })] }).then(message => setTimeout(() => message.delete().catch(() => { }), 2500));
             return;
         }

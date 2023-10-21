@@ -5,7 +5,7 @@ import ReplyEmbed from '../components/replyembed';
 
 const command = new SlashCommandBuilder()
 .setName('deletedata')
-.setDescription('Deletes all of your saved data globally!');
+.setDescription('Deletes all of your saved data globally (on all servers)!');
 
 async function execute(client:Client, interaction:ChatInputCommandInteraction) {
     const guildId = interaction.guildId;

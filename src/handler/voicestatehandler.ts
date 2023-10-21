@@ -57,12 +57,16 @@ async function checkStates(client:Client, oldState:VoiceState, newState:VoiceSta
     }
 }
 
-export default {handle: async function handle(client:Client, oldState:VoiceState, newState:VoiceState) {
+export default {
+    saveJoinTime:saveJoinTime,
+    saveListeningTime:saveListeningTime,
+    handle: async function handle(client:Client, oldState:VoiceState, newState:VoiceState) {
     if(newState.member?.user == client.user) {
         //Rythma logic
         //Rythma joins
         if(!oldState.channel && newState.channel && !newState.mute) {
             newState.channel.members.forEach(async (member) => {
+                if(member.id === client.user?.id) return;
                 if(member.voice.deaf) return;
                 await saveJoinTime(member.voice);
             })
@@ -72,6 +76,7 @@ export default {handle: async function handle(client:Client, oldState:VoiceState
         //Rythma leaves
         if(oldState.channel && !newState.channel) {
             oldState.channel.members.forEach(async (member) => {
+                if(member.id === client.user?.id) return;
                 await saveListeningTime(member.voice);
             })
             return;
@@ -80,6 +85,7 @@ export default {handle: async function handle(client:Client, oldState:VoiceState
         //Rythma gets muted
         if(!oldState.mute && newState.mute && newState.channel) {
             newState.channel.members.forEach(async (member) => {
+                if(member.id === client.user?.id) return;
                 await saveListeningTime(member.voice);
             });
             AudioHandler.pause(newState.guild.id);
@@ -89,6 +95,7 @@ export default {handle: async function handle(client:Client, oldState:VoiceState
         //Rythma get unmuted
         if(oldState.mute && !newState.mute && newState.channel) {
             newState.channel.members.forEach(async (member) => {
+                if(member.id === client.user?.id) return;
                 if(member.voice.deaf) return;
                 await saveJoinTime(member.voice);
             });

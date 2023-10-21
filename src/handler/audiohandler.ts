@@ -12,7 +12,8 @@ function addAudioPlayer(guild:string) {
         behaviors: {
             noSubscriber: NoSubscriberBehavior.Pause,
         },
-    })
+    });
+
     playerMap.set(guild, {player:player, resource:undefined});
 }
 
@@ -51,7 +52,7 @@ function play(guild:string, audioResource:string):boolean {
     if(!playerData?.resource) return false;
 
     const resource = loadResource(playerData.resource);
-    resource.volume?.setVolume(0.75);
+    resource.volume?.setVolume(0.5);
 
     DatabaseHandler.PlayTime.findOne({guild:guild}).exec().then((doc) => {
         if(!doc) {
@@ -87,7 +88,7 @@ function pause(guild:string):boolean {
         const newTime = (doc.time || 0) + (now - (doc.lastStart || now));
         DatabaseHandler.PlayTime.updateOne({guild:guild}, {time:newTime, playing:false}).exec();
     });
-    playerData?.player.pause();
+    playerData.player.pause();
 
     return true;
 }
