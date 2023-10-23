@@ -8,7 +8,7 @@ const data_1 = __importDefault(require("../data"));
 const embed = new discord_js_1.EmbedBuilder();
 embed.setTitle("Rythma Radio Player v." + data_1.default.VERSION);
 embed.setDescription("powered by https://ilovemusic.de/\nThe free german internet radio!");
-embed.setColor('DarkPurple');
+embed.setColor('Grey');
 const selectMenuActionRow = new discord_js_1.ActionRowBuilder();
 const selectMenu = new discord_js_1.StringSelectMenuBuilder();
 selectMenu.setCustomId('genre_selector');

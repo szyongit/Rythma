@@ -4,7 +4,7 @@ import Data from '../data';
 const embed = new EmbedBuilder();
 embed.setTitle("Rythma Radio Player v." + Data.VERSION);
 embed.setDescription("powered by https://ilovemusic.de/\nThe free german internet radio!");
-embed.setColor('DarkPurple');
+embed.setColor('Grey');
 
 const selectMenuActionRow = new ActionRowBuilder<StringSelectMenuBuilder>();
 const selectMenu = new StringSelectMenuBuilder()

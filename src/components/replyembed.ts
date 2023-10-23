@@ -4,7 +4,7 @@ function build(options:{title?:string, message?:string, isError?:boolean, color?
     const embed = new EmbedBuilder();
     embed.setDescription(options.message || null);
     embed.setTitle(options.title || null);
-    embed.setColor(options.color ? options.color : (options.isError ? 'Red' : 'DarkPurple'));
+    embed.setColor(options.color ? options.color : (options.isError ? 'DarkRed' : 'DarkGrey'));
     embed.setImage(options.imageURL || null);
     embed.setThumbnail(options.thumbnailURL || null);
     if(options.timestamp) embed.setTimestamp();

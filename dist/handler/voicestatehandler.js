@@ -40,12 +40,12 @@ async function checkStates(client, oldState, newState) {
         return;
     }
     //User joins the channel
-    if (!oldState.channel && newState.channel && !newState.deaf && newState.channel?.members.has(client.user?.id)) {
+    if (!oldState.channel && newState.channel && !newState.deaf && newState.channel.members.has(client.user?.id)) {
         await saveJoinTime(newState);
         return;
     }
     //User leaves the channel
-    if (oldState.channel && !newState.channel && oldState.channel?.members.has(client.user?.id)) {
+    if (oldState.channel && !newState.channel && oldState.channel.members.has(client.user?.id)) {
         await saveListeningTime(newState);
         return;
     }
